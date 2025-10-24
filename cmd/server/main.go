@@ -64,7 +64,9 @@ func init() {
 func runServer(cmd *cobra.Command, args []string) {
 	// Initialize logger
 	logger := initLogger(logLevel)
-	defer logger.Sync()
+	defer func() {
+		_ = logger.Sync()
+	}()
 
 	logger.Info("Starting DLV server",
 		zap.String("version", version),
@@ -98,7 +100,7 @@ func runServer(cmd *cobra.Command, args []string) {
 
 	// Initialize API server
 	router := gin.Default()
-	
+
 	// Configure CORS
 	config := cors.DefaultConfig()
 	config.AllowOrigins = []string{"http://localhost:5173", "http://localhost:3000"}
@@ -106,10 +108,10 @@ func runServer(cmd *cobra.Command, args []string) {
 	config.AllowHeaders = []string{"Origin", "Content-Type", "Content-Length", "Accept-Encoding", "X-CSRF-Token", "Authorization", "accept", "origin", "Cache-Control", "X-Requested-With"}
 	config.AllowCredentials = true
 	router.Use(cors.New(config))
-	
+
 	// Setup auth routes
 	api.SetupAuthRoutes(router, authService, userRepo, logger)
-	
+
 	// Setup other routes (lineage, etc.)
 	api.SetupRoutes(router, nil, logger)
 
@@ -143,7 +145,6 @@ func runServer(cmd *cobra.Command, args []string) {
 	}
 
 	logger.Info("Server exited")
-	_ = logger.Sync()
 }
 
 func initLogger(level string) *zap.Logger {
@@ -161,4 +162,3 @@ func initLogger(level string) *zap.Logger {
 
 	return logger
 }
-
