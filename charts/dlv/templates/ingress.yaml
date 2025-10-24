@@ -2,9 +2,9 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "realtime-lineage.fullname" . }}
+  name: {{ include "dlv.fullname" . }}
   labels:
-    {{- include "realtime-lineage.labels" . | nindent 4 }}
+    {{- include "dlv.labels" . | nindent 4 }}
   {{- with .Values.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
@@ -33,7 +33,7 @@ spec:
             pathType: {{ .pathType }}
             backend:
               service:
-                name: {{ include "realtime-lineage.fullname" $ }}
+                name: {{ include "dlv.fullname" $ }}
                 port:
                   number: {{ $.Values.service.port }}
           {{- end }}

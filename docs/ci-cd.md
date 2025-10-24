@@ -104,13 +104,13 @@ act push
 
 ```bash
 # Lint chart
-helm lint charts/realtime-lineage
+helm lint charts/dlv
 
 # Template rendering
-helm template test-release ./charts/realtime-lineage
+helm template test-release ./charts/dlv
 
 # Package chart
-helm package charts/realtime-lineage
+helm package charts/dlv
 
 # Create index
 helm repo index . --url https://dnguyenngoc.github.io/dlv/
@@ -122,7 +122,7 @@ helm repo index . --url https://dnguyenngoc.github.io/dlv/
 
 ```bash
 # Check lint errors
-helm lint charts/realtime-lineage
+helm lint charts/dlv
 
 # Fix any template errors
 # Common issues:
@@ -135,13 +135,13 @@ helm lint charts/realtime-lineage
 
 ```bash
 # Check dependencies
-helm dependency list charts/realtime-lineage
+helm dependency list charts/dlv
 
 # Update dependencies
-helm dependency update charts/realtime-lineage
+helm dependency update charts/dlv
 
 # Verify Chart.yaml
-cat charts/realtime-lineage/Chart.yaml
+cat charts/dlv/Chart.yaml
 ```
 
 ### Release workflow not triggering
@@ -215,7 +215,7 @@ jobs:
     steps:
       - name: Deploy to ${{ matrix.environment }}
         run: |
-          helm install dlv ./charts/realtime-lineage \
+          helm install dlv ./charts/dlv \
             --set environment=${{ matrix.environment }}
 ```
 

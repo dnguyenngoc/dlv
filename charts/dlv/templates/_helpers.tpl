@@ -1,14 +1,14 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "realtime-lineage.name" -}}
+{{- define "dlv.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Create a default fully qualified app name.
 */}}
-{{- define "realtime-lineage.fullname" -}}
+{{- define "dlv.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -24,16 +24,16 @@ Create a default fully qualified app name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "realtime-lineage.chart" -}}
+{{- define "dlv.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "realtime-lineage.labels" -}}
-helm.sh/chart: {{ include "realtime-lineage.chart" . }}
-{{ include "realtime-lineage.selectorLabels" . }}
+{{- define "dlv.labels" -}}
+helm.sh/chart: {{ include "dlv.chart" . }}
+{{ include "dlv.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -43,17 +43,17 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "realtime-lineage.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "realtime-lineage.name" . }}
+{{- define "dlv.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "dlv.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "realtime-lineage.serviceAccountName" -}}
+{{- define "dlv.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "realtime-lineage.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "dlv.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}

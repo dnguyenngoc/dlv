@@ -46,7 +46,7 @@ By participating in this project, you agree to maintain a friendly and respectfu
 5. **Test your changes**
    ```bash
    # Install Helm chart locally
-   helm install dlv ./charts/realtime-lineage
+   helm install dlv ./charts/dlv
    
    # Run any existing tests
    make test
@@ -120,7 +120,7 @@ feat: Add support for Flink collector
 
 3. **Build and install chart**:
    ```bash
-   helm install dlv ./charts/realtime-lineage
+   helm install dlv ./charts/dlv
    ```
 
 4. **Check status**:
@@ -130,7 +130,7 @@ feat: Add support for Flink collector
 
 5. **View logs**:
    ```bash
-   kubectl logs -f -n lineage deployment/dlv-realtime-lineage
+   kubectl logs -f -n lineage deployment/dlv-dlv
    ```
 
 ## Project Structure
@@ -138,7 +138,7 @@ feat: Add support for Flink collector
 ```
 dlv/
 ├── charts/
-│   └── realtime-lineage/      # Helm chart
+│   └── dlv/      # Helm chart
 │       ├── Chart.yaml
 │       ├── values.yaml
 │       └── templates/

@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "realtime-lineage.fullname" . }}
+  name: {{ include "dlv.fullname" . }}
   labels:
-    {{- include "realtime-lineage.labels" . | nindent 4 }}
+    {{- include "dlv.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "realtime-lineage.selectorLabels" . | nindent 6 }}
+      {{- include "dlv.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -18,7 +18,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "realtime-lineage.selectorLabels" . | nindent 8 }}
+        {{- include "dlv.selectorLabels" . | nindent 8 }}
         {{- with .Values.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -27,7 +27,7 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "realtime-lineage.serviceAccountName" . }}
+      serviceAccountName: {{ include "dlv.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
@@ -88,7 +88,7 @@ spec:
         - name: storage
         {{- if .Values.persistence.enabled }}
           persistentVolumeClaim:
-            claimName: {{ include "realtime-lineage.fullname" . }}-pvc
+            claimName: {{ include "dlv.fullname" . }}-pvc
         {{- else }}
           emptyDir: {}
         {{- end }}

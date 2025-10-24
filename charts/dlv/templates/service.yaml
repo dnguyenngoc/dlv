@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "realtime-lineage.fullname" . }}
+  name: {{ include "dlv.fullname" . }}
   labels:
-    {{- include "realtime-lineage.labels" . | nindent 4 }}
+    {{- include "dlv.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   ports:
@@ -18,5 +18,5 @@ spec:
       name: frontend
     {{- end }}
   selector:
-    {{- include "realtime-lineage.selectorLabels" . | nindent 4 }}
+    {{- include "dlv.selectorLabels" . | nindent 4 }}
 

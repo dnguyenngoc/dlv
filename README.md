@@ -69,7 +69,7 @@ helm repo add dlv https://dnguyenngoc.github.io/dlv
 helm repo update
 
 # Install DLV
-helm install dlv dlv/realtime-lineage \
+helm install dlv dlv/dlv \
   --namespace lineage \
   --create-namespace
 ```
@@ -105,7 +105,7 @@ frontend:
 EOF
 
 # Install with custom values
-helm install dlv dlv/realtime-lineage \
+helm install dlv dlv/dlv \
   --namespace lineage \
   --create-namespace \
   -f my-values.yaml
@@ -119,14 +119,14 @@ git clone https://github.com/dnguyenngoc/dlv.git
 cd dlv
 
 # Install using kubectl
-helm template charts/realtime-lineage | kubectl apply -f -
+helm template charts/dlv | kubectl apply -f -
 ```
 
 ### Access the UI
 
 ```bash
 # Port forward to access the frontend
-kubectl port-forward -n lineage svc/dlv-realtime-lineage 3000:3000
+kubectl port-forward -n lineage svc/dlv-dlv 3000:3000
 
 # Open browser
 open http://localhost:3000

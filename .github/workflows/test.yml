@@ -19,21 +19,21 @@ jobs:
           version: 'latest'
 
       - name: Helm Lint
-        run: helm lint charts/realtime-lineage
+        run: helm lint charts/dlv
 
       - name: Helm Template
         run: |
-          helm template test-release ./charts/realtime-lineage \
+          helm template test-release ./charts/dlv \
             --namespace lineage \
             --debug
 
       - name: Helm Package
         run: |
-          helm package charts/realtime-lineage
+          helm package charts/dlv
           ls -la *.tgz
 
       - name: Verify Chart Dependencies
         run: |
-          helm dependency update charts/realtime-lineage
-          helm dependency list charts/realtime-lineage
+          helm dependency update charts/dlv
+          helm dependency list charts/dlv
 

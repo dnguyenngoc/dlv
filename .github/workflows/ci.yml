@@ -22,16 +22,16 @@ jobs:
         uses: azure/setup-kubectl@v3
 
       - name: Lint Helm Chart
-        run: helm lint charts/realtime-lineage
+        run: helm lint charts/dlv
 
       - name: Validate Chart Schema
         run: |
-          helm dependency update charts/realtime-lineage
-          helm package charts/realtime-lineage
+          helm dependency update charts/dlv
+          helm package charts/dlv
 
       - name: Template Rendering Test
         run: |
-          helm template dlv ./charts/realtime-lineage \
+          helm template dlv ./charts/dlv \
             --namespace lineage \
             --debug > /dev/null
 

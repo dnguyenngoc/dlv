@@ -34,19 +34,19 @@ test:
 # Build Helm chart
 build: helm-lint
 	@echo "Building Helm chart..."
-	@helm package charts/realtime-lineage
+	@helm package charts/dlv
 	@echo "✓ Chart built successfully"
 
 # Lint Helm chart
 helm-lint:
 	@echo "Linting Helm chart..."
-	@helm lint charts/realtime-lineage
+	@helm lint charts/dlv
 	@echo "✓ Helm chart lint passed"
 
 # Install Helm chart locally
 helm-install:
 	@echo "Installing Helm chart..."
-	@helm install dlv charts/realtime-lineage \
+	@helm install dlv charts/dlv \
 		--namespace lineage \
 		--create-namespace \
 		--debug
@@ -56,7 +56,7 @@ helm-install:
 helm-install-custom:
 	@echo "Installing Helm chart with custom values..."
 	@read -p "Enter values file path: " values_file; \
-	helm install dlv charts/realtime-lineage \
+	helm install dlv charts/dlv \
 		--namespace lineage \
 		--create-namespace \
 		-f $$values_file \
@@ -79,7 +79,7 @@ clean:
 # Dry run
 helm-dry-run:
 	@echo "Running Helm dry-run..."
-	@helm install dlv charts/realtime-lineage \
+	@helm install dlv charts/dlv \
 		--namespace lineage \
 		--create-namespace \
 		--dry-run \
@@ -88,29 +88,29 @@ helm-dry-run:
 # Template rendering
 helm-template:
 	@echo "Rendering Helm templates..."
-	@helm template dlv charts/realtime-lineage
+	@helm template dlv charts/dlv
 
 # Show all values
 helm-show-values:
-	@helm show values charts/realtime-lineage
+	@helm show values charts/dlv
 
 # Create release
 release:
 	@echo "Creating release..."
 	@read -p "Enter version (e.g., 0.1.0): " version; \
-	sed -i.bak "s/^version: .*/version: $$version/" charts/realtime-lineage/Chart.yaml; \
-	sed -i.bak "s/^appVersion: .*/appVersion: \"$$version\"/" charts/realtime-lineage/Chart.yaml; \
-	helm package charts/realtime-lineage; \
+	sed -i.bak "s/^version: .*/version: $$version/" charts/dlv/Chart.yaml; \
+	sed -i.bak "s/^appVersion: .*/appVersion: \"$$version\"/" charts/dlv/Chart.yaml; \
+	helm package charts/dlv; \
 	echo "✓ Release $$version created"
 
 # Development helpers
 port-forward:
 	@echo "Port forwarding to DLV..."
-	@kubectl port-forward -n lineage svc/dlv-realtime-lineage 3000:3000
+	@kubectl port-forward -n lineage svc/dlv-dlv 3000:3000
 
 logs:
 	@echo "Showing DLV logs..."
-	@kubectl logs -f -n lineage deployment/dlv-realtime-lineage
+	@kubectl logs -f -n lineage deployment/dlv-dlv
 
 status:
 	@echo "DLV status:"

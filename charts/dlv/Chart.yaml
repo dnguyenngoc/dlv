@@ -1,6 +1,6 @@
 apiVersion: v2
-name: realtime-lineage
-description: A Helm chart for Real-time Data Lineage Visualizer - Track and visualize data flow in real-time across your data pipeline
+name: dlv
+description: A Helm chart for Data Lineage Visualizer - Track and visualize data flow in real-time across your data pipeline
 type: application
 version: 0.1.0
 appVersion: "1.0.0"

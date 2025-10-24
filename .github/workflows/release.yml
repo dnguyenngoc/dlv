@@ -24,7 +24,7 @@ jobs:
 
       - name: Package Helm Chart
         run: |
-          helm package charts/realtime-lineage
+          helm package charts/dlv
           mkdir -p gh-pages
           mv *.tgz gh-pages/
 

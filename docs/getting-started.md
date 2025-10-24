@@ -36,7 +36,7 @@ helm repo add dlv https://dnguyenngoc.github.io/dlv
 helm repo update
 
 # Install DLV
-helm install dlv dlv/realtime-lineage \
+helm install dlv dlv/dlv \
   --namespace lineage \
   --create-namespace \
   --set processor.graphdb.neo4j.password=your-password
@@ -69,7 +69,7 @@ processor:
 EOF
 
 # Install with custom values
-helm install dlv dlv/realtime-lineage \
+helm install dlv dlv/dlv \
   --namespace lineage \
   --create-namespace \
   -f my-values.yaml
@@ -79,7 +79,7 @@ helm install dlv dlv/realtime-lineage \
 
 ```bash
 # Port forward
-kubectl port-forward -n lineage svc/dlv-realtime-lineage 3000:3000
+kubectl port-forward -n lineage svc/dlv-dlv 3000:3000
 
 # Open browser
 open http://localhost:3000
@@ -131,10 +131,10 @@ kubectl get pods -n lineage
 
 ```bash
 # Backend logs
-kubectl logs -f -n lineage deployment/dlv-realtime-lineage
+kubectl logs -f -n lineage deployment/dlv-dlv
 
 # Frontend logs
-kubectl logs -f -n lineage deployment/dlv-realtime-lineage-frontend
+kubectl logs -f -n lineage deployment/dlv-dlv-frontend
 ```
 
 ### Common Issues
@@ -147,7 +147,7 @@ kubectl logs -f -n lineage deployment/dlv-realtime-lineage-frontend
 
 ```bash
 # Test Neo4j connection
-kubectl exec -it -n lineage deployment/dlv-realtime-lineage -- \
+kubectl exec -it -n lineage deployment/dlv-dlv -- \
   nc -zv neo4j 7687
 ```
 
@@ -159,7 +159,7 @@ kubectl exec -it -n lineage deployment/dlv-realtime-lineage -- \
 
 ```bash
 # Check collector configuration
-kubectl get configmap -n lineage dlv-realtime-lineage -o yaml
+kubectl get configmap -n lineage dlv-dlv -o yaml
 ```
 
 #### 3. Frontend not loading
@@ -173,7 +173,7 @@ kubectl get configmap -n lineage dlv-realtime-lineage -o yaml
 kubectl get svc -n lineage
 
 # Check endpoints
-kubectl get endpoints -n lineage dlv-realtime-lineage
+kubectl get endpoints -n lineage dlv-dlv
 ```
 
 ## Next Steps

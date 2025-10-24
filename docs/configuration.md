@@ -186,7 +186,7 @@ frontend:
   enabled: true
   
   image:
-    repository: "dlv/realtime-lineage-ui"
+    repository: "dlv/dlv-ui"
     tag: "latest"
     pullPolicy: "IfNotPresent"
   
@@ -247,7 +247,7 @@ frontend:
 replicaCount: 1
 
 image:
-  repository: "dlv/realtime-lineage"
+  repository: "dlv/dlv"
   pullPolicy: "IfNotPresent"
   tag: "latest"
 

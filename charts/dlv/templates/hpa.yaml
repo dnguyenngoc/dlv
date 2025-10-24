@@ -2,14 +2,14 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "realtime-lineage.fullname" . }}
+  name: {{ include "dlv.fullname" . }}
   labels:
-    {{- include "realtime-lineage.labels" . | nindent 4 }}
+    {{- include "dlv.labels" . | nindent 4 }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ include "realtime-lineage.fullname" . }}
+    name: {{ include "dlv.fullname" . }}
   minReplicas: {{ .Values.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.autoscaling.maxReplicas }}
   metrics:

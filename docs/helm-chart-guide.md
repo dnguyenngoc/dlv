@@ -5,7 +5,7 @@ This guide covers the structure and usage of the DLV Helm chart.
 ## Chart Structure
 
 ```
-charts/realtime-lineage/
+charts/dlv/
 ├── Chart.yaml              # Chart metadata
 ├── values.yaml             # Default configuration values
 └── templates/              # Kubernetes manifests
@@ -135,7 +135,7 @@ securityContext:
 ### Basic Installation
 
 ```bash
-helm install dlv dlv/realtime-lineage \
+helm install dlv dlv/dlv \
   --namespace lineage \
   --create-namespace
 ```
@@ -143,7 +143,7 @@ helm install dlv dlv/realtime-lineage \
 ### With Custom Values
 
 ```bash
-helm install dlv dlv/realtime-lineage \
+helm install dlv dlv/dlv \
   --namespace lineage \
   --create-namespace \
   -f my-values.yaml
@@ -152,7 +152,7 @@ helm install dlv dlv/realtime-lineage \
 ### With Inline Values
 
 ```bash
-helm install dlv dlv/realtime-lineage \
+helm install dlv dlv/dlv \
   --namespace lineage \
   --create-namespace \
   --set collectors.spark.enabled=true \
@@ -162,7 +162,7 @@ helm install dlv dlv/realtime-lineage \
 ## Upgrading
 
 ```bash
-helm upgrade dlv dlv/realtime-lineage \
+helm upgrade dlv dlv/dlv \
   --namespace lineage \
   -f updated-values.yaml
 ```
@@ -178,13 +178,13 @@ helm uninstall dlv --namespace lineage
 ### Chart Linting
 
 ```bash
-helm lint charts/realtime-lineage
+helm lint charts/dlv
 ```
 
 ### Dry Run
 
 ```bash
-helm install dlv charts/realtime-lineage \
+helm install dlv charts/dlv \
   --namespace lineage \
   --dry-run \
   --debug
@@ -193,13 +193,13 @@ helm install dlv charts/realtime-lineage \
 ### Template Rendering
 
 ```bash
-helm template dlv charts/realtime-lineage
+helm template dlv charts/dlv
 ```
 
 ### Show Values
 
 ```bash
-helm show values dlv/realtime-lineage
+helm show values dlv/dlv
 ```
 
 ## Best Practices
