@@ -1,0 +1,39 @@
+name: Test
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  test-chart:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: 'latest'
+
+      - name: Helm Lint
+        run: helm lint charts/realtime-lineage
+
+      - name: Helm Template
+        run: |
+          helm template test-release ./charts/realtime-lineage \
+            --namespace lineage \
+            --debug
+
+      - name: Helm Package
+        run: |
+          helm package charts/realtime-lineage
+          ls -la *.tgz
+
+      - name: Verify Chart Dependencies
+        run: |
+          helm dependency update charts/realtime-lineage
+          helm dependency list charts/realtime-lineage
+

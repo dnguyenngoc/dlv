@@ -29,18 +29,15 @@ jobs:
           helm dependency update charts/realtime-lineage
           helm package charts/realtime-lineage
 
-      - name: Dry Run Install
+      - name: Template Rendering Test
         run: |
-          helm install dlv ./charts/realtime-lineage \
+          helm template dlv ./charts/realtime-lineage \
             --namespace lineage \
-            --create-namespace \
-            --dry-run \
-            --debug
+            --debug > /dev/null
 
-      - name: Check YAML files
-        run: |
-          find . -name "*.yaml" -o -name "*.yml" | grep -v "./charts/" | while read file; do
-            echo "Checking $file"
-            python3 -c "import yaml; yaml.safe_load(open('$file'))"
-          done
+      - name: Check YAML syntax
+        uses: ibiqlik/action-yamllint@v3
+        with:
+          file_or_dir: .
+          config_file: .yamllint.yml
 
