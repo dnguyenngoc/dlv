@@ -9,7 +9,7 @@ import (
 )
 
 // SetupAuthRoutes configures authentication routes
-func SetupAuthRoutes(router *gin.Engine, authService *auth.AuthService, userRepo *repository.UserRepository, logger *zap.Logger) {
+func SetupAuthRoutes(router *gin.Engine, authService *auth.Service, userRepo *repository.UserRepository, logger *zap.Logger) {
 	authHandlers := NewAuthHandlers(authService, userRepo, logger)
 
 	// Public auth routes

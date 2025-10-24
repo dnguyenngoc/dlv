@@ -93,7 +93,7 @@ func runServer(cmd *cobra.Command, args []string) {
 	}()
 
 	// Initialize auth service
-	authService := auth.NewAuthService(secretKey)
+	authService := auth.NewService(secretKey)
 
 	// Initialize repositories
 	userRepo := repository.NewUserRepository(db.DB, logger)

@@ -13,14 +13,20 @@ import (
 type MapClaims = jwt.MapClaims
 
 var (
+	// ErrInvalidCredentials is returned when login credentials are invalid
 	ErrInvalidCredentials = errors.New("invalid credentials")
-	ErrUserNotFound       = errors.New("user not found")
-	ErrUserExists         = errors.New("user already exists")
-	ErrTokenExpired       = errors.New("token expired")
-	ErrInvalidToken       = errors.New("invalid token")
+	// ErrUserNotFound is returned when a user is not found
+	ErrUserNotFound = errors.New("user not found")
+	// ErrUserExists is returned when trying to create a user that already exists
+	ErrUserExists = errors.New("user already exists")
+	// ErrTokenExpired is returned when a JWT token has expired
+	ErrTokenExpired = errors.New("token expired")
+	// ErrInvalidToken is returned when a JWT token is invalid
+	ErrInvalidToken = errors.New("invalid token")
 )
 
 const (
+	// TokenExpiration is the default JWT token expiration time
 	TokenExpiration = 24 * time.Hour
 )
 
@@ -28,23 +34,23 @@ const (
 // #nosec G101 -- This is just a default placeholder
 var DefaultSecretKey = "dlv-secret-key-change-in-production"
 
-// AuthService handles authentication logic
-type AuthService struct {
+// Service handles authentication logic
+type Service struct {
 	secretKey []byte
 }
 
-// NewAuthService creates a new auth service
-func NewAuthService(secretKey string) *AuthService {
+// NewService creates a new auth service
+func NewService(secretKey string) *Service {
 	if secretKey == "" {
 		secretKey = DefaultSecretKey
 	}
-	return &AuthService{
+	return &Service{
 		secretKey: []byte(secretKey),
 	}
 }
 
 // HashPassword hashes a password using bcrypt
-func (s *AuthService) HashPassword(password string) (string, error) {
+func (s *Service) HashPassword(password string) (string, error) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return "", err
@@ -53,13 +59,13 @@ func (s *AuthService) HashPassword(password string) (string, error) {
 }
 
 // VerifyPassword verifies a password against a hash
-func (s *AuthService) VerifyPassword(password, hash string) bool {
+func (s *Service) VerifyPassword(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
 }
 
 // GenerateToken generates a JWT token for a user
-func (s *AuthService) GenerateToken(user *models.User) (string, error) {
+func (s *Service) GenerateToken(user *models.User) (string, error) {
 	claims := jwt.MapClaims{
 		"user_id":  user.ID,
 		"username": user.Username,
@@ -73,7 +79,7 @@ func (s *AuthService) GenerateToken(user *models.User) (string, error) {
 }
 
 // ValidateToken validates a JWT token and returns the claims
-func (s *AuthService) ValidateToken(tokenString string) (jwt.MapClaims, error) {
+func (s *Service) ValidateToken(tokenString string) (jwt.MapClaims, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, ErrInvalidToken
@@ -99,7 +105,7 @@ func (s *AuthService) ValidateToken(tokenString string) (jwt.MapClaims, error) {
 }
 
 // GetUserIDFromToken extracts user ID from token claims
-func (s *AuthService) GetUserIDFromToken(claims jwt.MapClaims) (int, error) {
+func (s *Service) GetUserIDFromToken(claims jwt.MapClaims) (int, error) {
 	userID, ok := claims["user_id"].(float64)
 	if !ok {
 		return 0, ErrInvalidToken
@@ -108,7 +114,7 @@ func (s *AuthService) GetUserIDFromToken(claims jwt.MapClaims) (int, error) {
 }
 
 // GetUserRoleFromToken extracts user role from token claims
-func (s *AuthService) GetUserRoleFromToken(claims jwt.MapClaims) (string, error) {
+func (s *Service) GetUserRoleFromToken(claims jwt.MapClaims) (string, error) {
 	role, ok := claims["role"].(string)
 	if !ok {
 		return "", ErrInvalidToken
