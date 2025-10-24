@@ -8,9 +8,8 @@
     "react-router-dom": "^6.20.0",
     "axios": "^1.6.2",
     "cytoscape": "^3.27.0",
-    "cytoscape-react": "^1.1.2",
-    "echarts": "^5.4.3",
-    "echarts-for-react": "^3.0.2"
+    "cytoscape-cose-bilkent": "^4.1.0",
+    "cytoscape-dagre": "^2.5.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.43",

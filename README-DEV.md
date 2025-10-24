@@ -1,302 +1,235 @@
 # DLV Development Guide
 
-## Quick Start
+This guide provides instructions for setting up and developing the DLV (Data Lineage Visualizer) project.
 
-### Prerequisites
+## Prerequisites
 
-- **Go 1.21+**: [Install Go](https://go.dev/doc/install)
-- **Node.js 18+**: [Install Node.js](https://nodejs.org/)
-- **Docker & Docker Compose**: [Install Docker](https://docs.docker.com/get-docker/)
-- **Neo4j**: Will run in Docker
-- **Make**: Usually pre-installed on macOS/Linux
+- Go 1.21 or higher
+- Node.js 18+ and npm
+- Neo4j or ArangoDB (for graph storage)
+- Make (optional, for build automation)
 
-### Option 1: Local Development (Recommended)
+## Project Structure
 
-#### 1. Start Neo4j
-
-```bash
-# Using Docker Compose
-docker-compose -f docker-compose.dev.yml up neo4j -d
-
-# Or use local Neo4j
-docker run -d \
-  --name neo4j \
-  -p 7474:7474 -p 7687:7687 \
-  -e NEO4J_AUTH=neo4j/dlv-dev-password \
-  neo4j:5-community
+```
+dlv/
+├── cmd/server/          # Main entry point
+├── internal/
+│   ├── api/            # HTTP API and WebSocket handlers
+│   ├── collector/      # Data source collectors
+│   └── processor/      # Lineage graph processor
+├── pkg/
+│   ├── graph/          # Graph database client
+│   └── models/         # Data models
+├── ui/                 # React frontend
+├── charts/             # Helm charts
+└── docs/               # Documentation
 ```
 
-#### 2. Start Backend
+## Backend Setup
+
+### 1. Install Dependencies
 
 ```bash
 # Install Go dependencies
-make deps
+go mod download
 
-# Run backend
-make run
-
-# Or directly
-go run ./cmd/server \
-  --graphdb-url=bolt://localhost:7687 \
-  --graphdb-user=neo4j \
-  --graphdb-pass=dlv-dev-password \
-  --spark-enabled=false \
-  --log-level=debug
+# If you need WebSocket support (not yet added to go.mod)
+go get github.com/gorilla/websocket
 ```
 
-#### 3. Start Frontend
+### 2. Configure Environment
+
+Create a `.env` file or set environment variables:
 
 ```bash
-# Install dependencies
+# Graph Database
+GRAPHDB_URL=bolt://localhost:7687
+GRAPHDB_USER=neo4j
+GRAPHDB_PASS=password
+
+# Server
+PORT=8080
+LOG_LEVEL=info
+
+# Collectors
+SPARK_ENABLED=true
+SPARK_URL=http://localhost:18080
+```
+
+### 3. Start Neo4j (Local Development)
+
+```bash
+docker run -d \
+  --name neo4j \
+  -p 7474:7474 -p 7687:7687 \
+  -e NEO4J_AUTH=neo4j/password \
+  neo4j:latest
+```
+
+### 4. Run the Server
+
+```bash
+go run cmd/server/main.go \
+  --port 8080 \
+  --graphdb-url bolt://localhost:7687 \
+  --graphdb-user neo4j \
+  --graphdb-pass password \
+  --spark-enabled true \
+  --spark-url http://localhost:18080
+```
+
+## Frontend Setup
+
+### 1. Install Dependencies
+
+```bash
 cd ui
 npm install
+```
 
-# Start dev server
+### 2. Configure Environment
+
+Create `ui/.env`:
+
+```bash
+VITE_API_URL=http://localhost:8080/api/v1
+```
+
+### 3. Run Development Server
+
+```bash
+cd ui
 npm run dev
 ```
 
-### Option 2: Docker Development
+The UI will be available at `http://localhost:5173`
 
-```bash
-# Start all services
-docker-compose -f docker-compose.dev.yml up
+## Building
 
-# Backend: http://localhost:8080
-# Frontend: http://localhost:3000
-# Neo4j Browser: http://localhost:7474
-```
-
-## Development Workflow
-
-### Backend Development
+### Backend
 
 ```bash
 # Build binary
-make build
+go build -o bin/dlv cmd/server/main.go
 
-# Run tests
-make test
-
-# Format code
-make fmt
-
-# Run linter
-make lint
-
-# Run server
-make run
+# Build with ldflags for version
+go build -ldflags "-X main.version=v1.0.0 -X main.commit=$(git rev-parse HEAD)" \
+  -o bin/dlv cmd/server/main.go
 ```
 
-### Frontend Development
+### Frontend
 
 ```bash
 cd ui
-
-# Install dependencies
-npm install
-
-# Start dev server
-npm run dev
-
-# Build for production
 npm run build
-
-# Preview production build
-npm run preview
 ```
 
-### Build Docker Images
-
-```bash
-# Build backend image
-make docker-build
-
-# Build frontend image (standalone)
-cd ui && docker build -t dlv-ui:latest .
-
-# Build both (production)
-docker-compose build
-```
+The built files will be in `ui/dist/`
 
 ## Testing
 
 ### Backend Tests
 
 ```bash
-# Run all tests
 go test ./...
-
-# Run tests with coverage
-go test -cover ./...
-
-# Run specific test
-go test ./internal/collector
 ```
 
 ### Frontend Tests
 
 ```bash
 cd ui
-
-# Run tests (when implemented)
 npm test
-
-# Run with coverage
-npm test -- --coverage
 ```
 
-## Database Setup
+## Docker Development
 
-### Neo4j Browser
-
-1. Open http://localhost:7474
-2. Login with:
-   - Username: `neo4j`
-   - Password: `dlv-dev`
-
-### Create Test Data
-
-```cypher
-// Create sample lineage
-CREATE (src:Table {name: "users", source: "postgres"})
-CREATE (tgt:Table {name: "users_enriched", source: "postgres"})
-CREATE (job:Job {name: "enrich_users", type: "spark"})
-CREATE (src)-[:READS]->(job)
-CREATE (job)-[:WRITES]->(tgt)
-```
-
-## API Testing
-
-### Using curl
+### Backend + Frontend
 
 ```bash
-# Health check
-curl http://localhost:8080/health
-
-# Get lineage graph
-curl http://localhost:8080/api/v1/lineage/graph
-
-# Search lineage
-curl "http://localhost:8080/api/v1/lineage/search?q=users"
+docker-compose -f docker-compose.dev.yml up
 ```
 
-### Using HTTPie
+This will start:
+- DLV backend server
+- Neo4j database
+- Frontend development server
 
-```bash
-# Install httpie
-brew install httpie  # macOS
-# or
-pip install httpie
+## API Endpoints
 
-# Make requests
-http GET http://localhost:8080/health
-http GET http://localhost:8080/api/v1/lineage/nodes
-```
+### REST API
 
-## Debugging
+- `GET /health` - Health check
+- `GET /api/v1/lineage/graph` - Get full lineage graph
+- `GET /api/v1/lineage/nodes` - Get all nodes
+- `GET /api/v1/lineage/nodes/:id` - Get node details
+- `GET /api/v1/lineage/edges` - Get all edges
+- `GET /api/v1/lineage/search?q=query` - Search lineage
 
-### Backend Debugging
+### WebSocket
 
-```bash
-# Run with debug logging
-go run ./cmd/server --log-level=debug
+- `WS /ws/lineage` - Real-time lineage updates
 
-# Use Delve debugger
-dlv debug ./cmd/server
-```
+## Architecture Overview
 
-### Frontend Debugging
+### Components
 
-- Open Chrome DevTools (F12)
-- Use React DevTools extension
-- Check Network tab for API calls
-- Use Console for errors
+1. **Collectors** - Extract lineage from data sources (Spark, Airflow, Kafka, Flink)
+2. **Processor** - Build and maintain lineage graph relationships
+3. **Graph Database** - Store lineage graph (Neo4j/ArangoDB)
+4. **API** - REST API and WebSocket for frontend
+5. **Frontend** - React-based visualization UI
 
-### Database Debugging
-
-```bash
-# Connect to Neo4j shell
-docker exec -it dlv-neo4j cypher-shell -u neo4j -p dlv-dev-password
-
-# Run queries
-MATCH (n) RETURN n LIMIT 10;
-```
-
-## Environment Variables
-
-Create `.env` file:
-
-```env
-# Graph Database
-GRAPHDB_URL=bolt://localhost:7687
-GRAPHDB_USER=neo4j
-GRAPHDB_PASS=dlv-dev-password
-
-# Spark Collector
-SPARK_ENABLED=false
-SPARK_URL=http://localhost:18080
-
-# Airflow Collector
-AIRFLOW_ENABLED=false
-AIRFLOW_URL=http://localhost:8080
-
-# Server
-PORT=8080
-LOG_LEVEL=debug
-```
-
-## Project Structure
+### Data Flow
 
 ```
-dlv/
-├── cmd/server/          # Application entry point
-├── internal/            # Private application code
-│   ├── api/            # HTTP handlers
-│   ├── collector/      # Data collectors
-│   └── processor/     # Lineage processor
-├── pkg/                # Public packages
-│   ├── graph/         # Graph DB client
-│   └── models/       # Data models
-├── ui/                 # Frontend
-│   ├── src/           # Source code
-│   ├── public/        # Static files
-│   └── dist/          # Build output
-├── charts/dlv/         # Helm chart
-└── docs/              # Documentation
+Data Sources → Collectors → Processor → Graph DB → API → Frontend
 ```
 
-## Useful Commands
+## Development Workflow
 
-```bash
-# Quick restart everything
-make clean && make build && make run
+1. Start Neo4j: `docker run -d -p 7687:7687 neo4j`
+2. Start backend: `go run cmd/server/main.go`
+3. Start frontend: `cd ui && npm run dev`
+4. Make changes and test
+5. Run tests: `go test ./... && cd ui && npm test`
+6. Build and deploy
 
-# Format all code
-make fmt && cd ui && npm run format
+## Adding a New Collector
 
-# Run complete build
-make docker-build
+1. Create a new file in `internal/collector/` (e.g., `kafka.go`)
+2. Implement the `Collector` interface
+3. Register in `cmd/server/main.go`
+4. Add configuration in Helm charts
 
-# Check for issues
-make lint && cd ui && npm run lint
+## Troubleshooting
 
-# Clean up
-make clean
-docker-compose -f docker-compose.dev.yml down -v
-```
+### Neo4j Connection Issues
 
-## Next Steps
+- Check if Neo4j is running: `docker ps | grep neo4j`
+- Verify credentials in environment variables
+- Check Neo4j logs: `docker logs neo4j`
 
-1. ✅ Setup complete - Start implementing features
-2. Start with Neo4j client implementation
-3. Implement Spark collector
-4. Build REST API endpoints
-5. Create frontend components
+### WebSocket Connection Failed
 
-## Getting Help
+- Ensure backend is running on port 8080
+- Check CORS settings in development
+- Verify WebSocket endpoint: `ws://localhost:8080/ws/lineage`
 
-- Check [README.md](README.md) for overview
-- See [docs/](docs/) for detailed documentation
-- Open an issue on GitHub
-- Read the code (it's documented!)
+### Frontend Not Loading
 
+- Check if backend is running
+- Verify `VITE_API_URL` in `ui/.env`
+- Check browser console for errors
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests
+5. Submit a pull request
+
+## License
+
+Apache License 2.0

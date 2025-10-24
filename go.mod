@@ -4,6 +4,7 @@ go 1.21
 
 require (
 	github.com/gin-gonic/gin v1.9.1
+	github.com/gorilla/websocket v1.5.1
 	github.com/neo4j/neo4j-go-driver/v5 v5.15.0
 	github.com/prometheus/client_golang v1.18.0
 	github.com/spf13/cobra v1.8.0
@@ -45,4 +46,3 @@ require (
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
