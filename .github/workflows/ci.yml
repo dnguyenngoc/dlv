@@ -106,6 +106,9 @@ jobs:
         with:
           version: '3.13.0'
       
+      - name: Build chart dependencies
+        run: helm dependency build charts/dlv
+      
       - name: Lint chart
         run: helm lint charts/dlv
 
