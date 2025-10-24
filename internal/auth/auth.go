@@ -115,4 +115,3 @@ func (s *AuthService) GetUserRoleFromToken(claims jwt.MapClaims) (string, error)
 	}
 	return role, nil
 }
-

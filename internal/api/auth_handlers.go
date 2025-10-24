@@ -145,4 +145,3 @@ func (h *AuthHandlers) Logout(c *gin.Context) {
 	// TODO: Implement token blacklisting or session management
 	c.JSON(http.StatusOK, gin.H{"message": "Logged out successfully"})
 }
-

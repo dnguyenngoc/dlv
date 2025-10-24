@@ -29,15 +29,15 @@ func (r *UserRepository) CreateUser(user *models.User) error {
 		VALUES ($1, $2, $3, $4)
 		RETURNING id, created_at, updated_at
 	`
-	
+
 	err := r.db.QueryRow(query, user.Username, user.Email, user.PasswordHash, user.Role).
 		Scan(&user.ID, &user.CreatedAt, &user.UpdatedAt)
-	
+
 	if err != nil {
 		r.logger.Error("Failed to create user", zap.Error(err))
 		return fmt.Errorf("failed to create user: %w", err)
 	}
-	
+
 	return nil
 }
 
@@ -45,12 +45,12 @@ func (r *UserRepository) CreateUser(user *models.User) error {
 func (r *UserRepository) GetUserByID(id int) (*models.User, error) {
 	user := &models.User{}
 	query := `SELECT id, username, email, password_hash, role, created_at, updated_at FROM users WHERE id = $1`
-	
+
 	err := r.db.QueryRow(query, id).Scan(
 		&user.ID, &user.Username, &user.Email, &user.PasswordHash,
 		&user.Role, &user.CreatedAt, &user.UpdatedAt,
 	)
-	
+
 	if err == sql.ErrNoRows {
 		return nil, fmt.Errorf("user not found")
 	}
@@ -58,7 +58,7 @@ func (r *UserRepository) GetUserByID(id int) (*models.User, error) {
 		r.logger.Error("Failed to get user by ID", zap.Error(err))
 		return nil, fmt.Errorf("failed to get user: %w", err)
 	}
-	
+
 	return user, nil
 }
 
@@ -66,12 +66,12 @@ func (r *UserRepository) GetUserByID(id int) (*models.User, error) {
 func (r *UserRepository) GetUserByUsername(username string) (*models.User, error) {
 	user := &models.User{}
 	query := `SELECT id, username, email, password_hash, role, created_at, updated_at FROM users WHERE username = $1`
-	
+
 	err := r.db.QueryRow(query, username).Scan(
 		&user.ID, &user.Username, &user.Email, &user.PasswordHash,
 		&user.Role, &user.CreatedAt, &user.UpdatedAt,
 	)
-	
+
 	if err == sql.ErrNoRows {
 		return nil, fmt.Errorf("user not found")
 	}
@@ -79,7 +79,7 @@ func (r *UserRepository) GetUserByUsername(username string) (*models.User, error
 		r.logger.Error("Failed to get user by username", zap.Error(err))
 		return nil, fmt.Errorf("failed to get user: %w", err)
 	}
-	
+
 	return user, nil
 }
 
@@ -87,12 +87,12 @@ func (r *UserRepository) GetUserByUsername(username string) (*models.User, error
 func (r *UserRepository) GetUserByEmail(email string) (*models.User, error) {
 	user := &models.User{}
 	query := `SELECT id, username, email, password_hash, role, created_at, updated_at FROM users WHERE email = $1`
-	
+
 	err := r.db.QueryRow(query, email).Scan(
 		&user.ID, &user.Username, &user.Email, &user.PasswordHash,
 		&user.Role, &user.CreatedAt, &user.UpdatedAt,
 	)
-	
+
 	if err == sql.ErrNoRows {
 		return nil, fmt.Errorf("user not found")
 	}
@@ -100,7 +100,7 @@ func (r *UserRepository) GetUserByEmail(email string) (*models.User, error) {
 		r.logger.Error("Failed to get user by email", zap.Error(err))
 		return nil, fmt.Errorf("failed to get user: %w", err)
 	}
-	
+
 	return user, nil
 }
 
@@ -108,20 +108,20 @@ func (r *UserRepository) GetUserByEmail(email string) (*models.User, error) {
 func (r *UserRepository) UserExists(username, email string) (bool, error) {
 	query := `SELECT EXISTS(SELECT 1 FROM users WHERE username = $1 OR email = $2)`
 	var exists bool
-	
+
 	err := r.db.QueryRow(query, username, email).Scan(&exists)
 	if err != nil {
 		r.logger.Error("Failed to check user existence", zap.Error(err))
 		return false, fmt.Errorf("failed to check user existence: %w", err)
 	}
-	
+
 	return exists, nil
 }
 
 // GetAllUsers retrieves all users
 func (r *UserRepository) GetAllUsers() ([]*models.User, error) {
 	query := `SELECT id, username, email, password_hash, role, created_at, updated_at FROM users ORDER BY created_at DESC`
-	
+
 	rows, err := r.db.Query(query)
 	if err != nil {
 		r.logger.Error("Failed to get all users", zap.Error(err))
@@ -130,7 +130,7 @@ func (r *UserRepository) GetAllUsers() ([]*models.User, error) {
 	defer func() {
 		_ = rows.Close()
 	}()
-	
+
 	var users []*models.User
 	for rows.Next() {
 		user := &models.User{}
@@ -144,7 +144,6 @@ func (r *UserRepository) GetAllUsers() ([]*models.User, error) {
 		}
 		users = append(users, user)
 	}
-	
+
 	return users, nil
 }
-

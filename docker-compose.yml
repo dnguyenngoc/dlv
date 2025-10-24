@@ -1,3 +1,4 @@
+---
 version: '3.8'
 
 services:
@@ -26,7 +27,9 @@ services:
   backend:
     build:
       context: .
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
+      args:
+        MODE: dev
     container_name: dlv-backend
     ports:
       - "8080:8080"
@@ -64,7 +67,9 @@ services:
   frontend:
     build:
       context: ./ui
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
+      args:
+        MODE: dev
     container_name: dlv-frontend
     ports:
       - "5173:5173"
@@ -83,4 +88,3 @@ volumes:
 networks:
   dlv-network:
     driver: bridge
-

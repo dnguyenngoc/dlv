@@ -27,4 +27,3 @@ func SetupAuthRoutes(router *gin.Engine, authService *auth.AuthService, userRepo
 		protected.POST("/logout", authHandlers.Logout)
 	}
 }
-

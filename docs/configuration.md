@@ -61,13 +61,13 @@ collectors:
     enabled: true
     brokers: "kafka-0:9092,kafka-1:9092"
     refreshInterval: 5s
-    
+
     # Security (optional)
     saslEnabled: false
     saslMechanism: "PLAIN"
     saslUsername: ""
     saslPassword: ""
-    
+
     # TLS (optional)
     tlsEnabled: false
     tlsInsecure: false
@@ -82,7 +82,7 @@ collectors:
     saslMechanism: "SCRAM-SHA-256"
     saslUsername: "dlv-user"
     saslPassword: "secret-password"
-    
+
     tlsEnabled: true
     tlsCaCert: "/etc/kafka/ca-cert.pem"
 ```
@@ -109,17 +109,17 @@ collectors:
 processor:
   graphdb:
     provider: "neo4j"
-    
+
     neo4j:
       url: "bolt://neo4j-server:7687"
       username: "neo4j"
       password: "change-me"
       database: "lineage"
-      
+
       # Connection pool settings
       maxConnections: 50
       connectionTimeout: 30s
-      
+
       # Index settings
       autoIndex: true
       nodeIndexProperties: ["name", "type"]
@@ -131,13 +131,13 @@ processor:
 processor:
   graphdb:
     provider: "arangodb"
-    
+
     arangodb:
       url: "http://arangodb-server:8529"
       username: "root"
       password: "change-me"
       database: "lineage"
-      
+
       # Connection settings
       maxConnections: 50
       timeout: 30s
@@ -155,22 +155,22 @@ processor:
       - airflow
       - kafka
       - flink
-  
+
   # Lineage depth
   maxDepth: 10                      # Maximum lineage depth to traverse
-  
+
   # Update settings
   updateInterval: 5s                # How often to update lineage
-  
+
   # Batch settings
   batchSize: 100                    # Batch size for database writes
-  
+
   # Anomaly detection
   anomalyDetection:
     enabled: true
     sensitivity: "medium"           # low, medium, high
     checkInterval: 60s
-  
+
   # Impact analysis
   impactAnalysis:
     enabled: true
@@ -184,12 +184,12 @@ processor:
 ```yaml
 frontend:
   enabled: true
-  
+
   image:
     repository: "dlv/dlv-ui"
     tag: "latest"
     pullPolicy: "IfNotPresent"
-  
+
   # Resource limits
   resources:
     limits:
@@ -207,19 +207,19 @@ frontend:
   visualization:
     # Layout algorithm
     layout: "force-directed"        # force-directed, hierarchical, circular
-    
+
     # Node appearance
     nodeSize: "auto"                # auto, fixed
     fixedNodeSize: 30
-    
+
     # Labels
     showLabels: true
     labelFontSize: 12
-    
+
     # Animation
     animationSpeed: 500             # milliseconds
     smoothTransitions: true
-    
+
     # Colors
     colorScheme: "default"          # default, dark, colorful
     useGradients: true
@@ -292,17 +292,17 @@ service:
 ingress:
   enabled: true
   className: "nginx"
-  
+
   annotations:
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
-  
+
   hosts:
     - host: lineage.example.com
       paths:
         - path: /
           pathType: Prefix
-  
+
   tls:
     - secretName: lineage-tls
       hosts:
@@ -336,7 +336,7 @@ podSecurityContext:
 ```yaml
 networkPolicy:
   enabled: true
-  
+
   ingress:
     - from:
       - namespaceSelector:
@@ -354,13 +354,13 @@ networkPolicy:
 ```yaml
 monitoring:
   enabled: true
-  
+
   serviceMonitor:
     enabled: true
     interval: 30s
     scrapeTimeout: 10s
     path: /metrics
-    
+
     # Additional labels
     labels:
       release: prometheus
@@ -372,7 +372,7 @@ monitoring:
 logging:
   level: info                       # debug, info, warn, error
   format: json                      # json, text
-  
+
   # Structured fields
   fields:
     service: "dlv"
@@ -385,10 +385,10 @@ logging:
 env:
   - name: DEBUG
     value: "false"
-  
+
   - name: LOG_LEVEL
     value: "info"
-  
+
   - name: CUSTOM_CONFIG
     value: "custom-value"
 ```
@@ -403,13 +403,13 @@ collectors:
   spark:
     enabled: true
     historyServerUrl: "http://spark-history:18080"
-  
+
   airflow:
     enabled: true
     apiUrl: "http://airflow:8080"
     authType: "token"
     token: "production-token"
-  
+
   kafka:
     enabled: true
     brokers: "kafka:9092"
@@ -486,4 +486,3 @@ processor:
 ```
 
 For more examples, see the [examples/](examples/) directory.
-

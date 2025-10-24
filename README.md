@@ -83,11 +83,11 @@ collectors:
   spark:
     enabled: true
     historyServerUrl: "http://spark-history:18080"
-  
+
   airflow:
     enabled: true
     apiUrl: "http://airflow:8080"
-  
+
   kafka:
     enabled: true
     brokers: "kafka:9092"
@@ -217,13 +217,13 @@ collectors:
     enabled: true
     historyServerUrl: "http://spark-history:18080"
     refreshInterval: 5s
-  
+
   airflow:
     enabled: true
     apiUrl: "http://airflow:8080"
     username: "admin"
     password: "password"
-  
+
   kafka:
     enabled: true
     brokers: "kafka:9092"
@@ -238,13 +238,13 @@ Choose your graph database backend:
 processor:
   graphdb:
     provider: "neo4j"  # or "arangodb"
-    
+
     neo4j:
       url: "bolt://neo4j:7687"
       username: "neo4j"
       password: "password"
       database: "lineage"
-    
+
     arangodb:
       url: "http://arangodb:8529"
       username: "root"
@@ -259,13 +259,13 @@ Customize the visualization:
 ```yaml
 frontend:
   enabled: true
-  
+
   visualization:
     layout: "force-directed"  # force-directed, hierarchical, circular
     nodeSize: "auto"
     showLabels: true
     animationSpeed: 500
-  
+
   features:
     realtimeUpdates: true
     streamingMode: true
@@ -356,4 +356,3 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 ---
 
 **Made with ❤️ for data engineers**
-

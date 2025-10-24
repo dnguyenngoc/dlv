@@ -92,4 +92,3 @@ make run
 - Uninstall old version first
 - Install latest version
 - Update PATH variable
-

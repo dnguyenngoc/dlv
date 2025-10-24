@@ -226,14 +226,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      
+
       - name: Build and push
         run: |
           docker build -t ghcr.io/dnguyenngoc/dlv:${{ github.sha }} .
@@ -307,4 +307,3 @@ image:
   pullPolicy: IfNotPresent
   tag: "v0.1.0"
 ```
-

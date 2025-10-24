@@ -77,4 +77,3 @@ func RoleMiddleware(requiredRoles ...string) gin.HandlerFunc {
 		c.Next()
 	}
 }
-

@@ -71,4 +71,3 @@ export function NodeDetailsPanel({ node, onClose }: NodeDetailsPanelProps) {
     </div>
   )
 }
-

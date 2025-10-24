@@ -27,4 +27,3 @@ ENTRYPOINT ["/entrypoint.sh"]
 
 # Run in development mode with hot reload
 CMD ["go", "run", "./cmd/server/main.go"]
-

@@ -13,10 +13,10 @@ export function LineageView() {
 
   useEffect(() => {
     loadGraph()
-    
+
     // Set up WebSocket for real-time updates
     const ws = new WebSocket(`ws://localhost:8080/ws/lineage`)
-    
+
     ws.onmessage = (event) => {
       const update = JSON.parse(event.data)
       handleGraphUpdate(update)
@@ -92,4 +92,3 @@ export function LineageView() {
     </div>
   )
 }
-

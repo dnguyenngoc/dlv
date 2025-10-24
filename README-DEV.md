@@ -5,7 +5,7 @@ This guide provides instructions for setting up and developing the DLV (Data Lin
 ## Prerequisites
 
 - Docker and Docker Compose
-- OR Go 1.21+ and Node.js 18+ for local development
+- OR Go 1.24+ and Node.js 18+ for local development
 
 ## Quick Start with Docker Compose
 

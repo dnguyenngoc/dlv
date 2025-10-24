@@ -35,4 +35,3 @@ export interface SearchResult {
   totalNodes: number
   totalEdges: number
 }
-

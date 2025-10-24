@@ -40,4 +40,3 @@ export const lineageApi = {
 }
 
 export default client
-

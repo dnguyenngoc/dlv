@@ -73,4 +73,3 @@ func (db *DB) Close() error {
 	db.logger.Info("Closing database connection")
 	return db.DB.Close()
 }
-

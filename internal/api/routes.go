@@ -96,16 +96,16 @@ func searchLineage(c *gin.Context) {
 
 	// TODO: Implement search logic
 	c.JSON(200, gin.H{
-		"nodes":       []interface{}{},
-		"edges":       []interface{}{},
-		"totalNodes":  0,
-		"totalEdges":  0,
+		"nodes":      []interface{}{},
+		"edges":      []interface{}{},
+		"totalNodes": 0,
+		"totalEdges": 0,
 	})
 }
 
 func getNodeDetails(c *gin.Context) {
 	nodeID := c.Param("id")
-	
+
 	// TODO: Query graph database for node details
 	c.JSON(200, gin.H{
 		"id":    nodeID,
@@ -116,4 +116,3 @@ func getNodeDetails(c *gin.Context) {
 		},
 	})
 }
-

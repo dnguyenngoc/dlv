@@ -157,4 +157,3 @@ For the first release:
 3. Documentation
 4. Tests
 5. Release preparation
-

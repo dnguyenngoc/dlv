@@ -40,14 +40,14 @@ var rootCmd = &cobra.Command{
 }
 
 var (
-	port         int
-	dbHost       string
-	dbPort       int
-	dbUser       string
-	dbPassword   string
-	dbName       string
-	secretKey    string
-	logLevel     string
+	port       int
+	dbHost     string
+	dbPort     int
+	dbUser     string
+	dbPassword string
+	dbName     string
+	secretKey  string
+	logLevel   string
 )
 
 func init() {

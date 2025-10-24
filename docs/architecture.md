@@ -198,4 +198,3 @@ React-based web application for lineage visualization.
 3. **Cost Tracking**: Integration with cost management tools
 4. **Schema Evolution Tracking**: Monitor schema changes over time
 5. **Automated Documentation**: Generate documentation from lineage
-

@@ -9,9 +9,9 @@ import (
 
 // Client represents a WebSocket client
 type Client struct {
-	hub    *WebSocketHub
-	conn   *websocket.Conn
-	send   chan []byte
+	hub  *WebSocketHub
+	conn *websocket.Conn
+	send chan []byte
 }
 
 // WebSocketHub maintains the set of active clients and broadcasts messages
@@ -67,4 +67,3 @@ func (h *WebSocketHub) BroadcastUpdate(data interface{}) {
 	}
 	h.broadcast <- message
 }
-

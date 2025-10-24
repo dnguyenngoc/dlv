@@ -20,14 +20,14 @@ repos:
     rev: v2.12.0
     hooks:
       - id: hadolint-docker
-        args: ['--ignore', 'DL3008', '--ignore', 'DL3009']
+        args: []
 
   # YAML
   - repo: https://github.com/adrienverge/yamllint
     rev: v1.33.0
     hooks:
       - id: yamllint
-        args: ['-d', '{extends: default, rules: {line-length: {max: 120}}}']
+        args: ['-d', '{extends: default, rules: {line-length: {max: 88}}}']
 
   # General
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -41,5 +41,3 @@ repos:
         args: ['--maxkb=1000']
       - id: check-merge-conflict
       - id: check-case-conflict
-      # - id: no-commit-to-branch
-      #   args: ['--branch', 'main']

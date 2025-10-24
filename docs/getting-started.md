@@ -52,7 +52,7 @@ collectors:
   spark:
     enabled: true
     historyServerUrl: "http://spark-history:18080"
-  
+
   airflow:
     enabled: true
     apiUrl: "http://airflow:8080"
@@ -187,4 +187,3 @@ kubectl get endpoints -n lineage dlv-dlv
 
 - Open an [Issue](https://github.com/dnguyenngoc/dlv/issues)
 - Join [Discussions](https://github.com/dnguyenngoc/dlv/discussions)
-

@@ -74,17 +74,17 @@ collectors:
     enabled: true
     historyServerUrl: "http://spark-history:18080"
     refreshInterval: 5s
-  
+
   airflow:
     enabled: true
     apiUrl: "http://airflow:8080"
     username: "admin"
     password: "password"
-  
+
   kafka:
     enabled: true
     brokers: "kafka:9092"
-  
+
   flink:
     enabled: true
     restPort: 8081
@@ -99,12 +99,12 @@ Choose Neo4j or ArangoDB:
 processor:
   graphdb:
     provider: "neo4j"  # or "arangodb"
-    
+
     neo4j:
       url: "bolt://neo4j:7687"
       username: "neo4j"
       password: "password"
-    
+
     arangodb:
       url: "http://arangodb:8529"
       username: "root"
@@ -214,4 +214,3 @@ helm show values dlv/dlv
 ## Examples
 
 See the [examples/](../examples/) directory for complete example configurations.
-

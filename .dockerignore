@@ -8,7 +8,7 @@
 .gitlab-ci.yml
 
 # Docker
-Dockerfile*
+Dockerfile.dev
 docker-compose*.yml
 .dockerignore
 

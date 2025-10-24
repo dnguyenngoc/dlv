@@ -47,7 +47,7 @@ By participating in this project, you agree to maintain a friendly and respectfu
    ```bash
    # Install Helm chart locally
    helm install dlv ./charts/dlv
-   
+
    # Run any existing tests
    make test
    ```
@@ -214,4 +214,3 @@ make test-integration
 By contributing, you agree that your contributions will be licensed under the Apache License 2.0.
 
 Thank you for contributing to DLV! 🎉
-

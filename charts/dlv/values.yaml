@@ -1,3 +1,4 @@
+---
 # Default values for dlv
 # This is a YAML-formatted file.
 
@@ -187,8 +188,8 @@ podLabels: {}
 
 # Environment variables
 env: []
-  # - name: CUSTOM_VAR
-  #   value: "value"
+# - name: CUSTOM_VAR
+#   value: "value"
 
 # Database configuration
 database:
@@ -236,4 +237,3 @@ monitoring:
 logging:
   level: info
   format: json
-
