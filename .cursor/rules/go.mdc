@@ -1,39 +1,157 @@
 ---
-description: General rule for backend development expertise across the project.
-globs: **/*
+description: Backend development rules for DLV (Data Lineage Visualizer) project
+globs: **/*.go, cmd/**/*, internal/**/*, pkg/**/*
 alwaysApply: false
 ---
 
-You are an AI Pair Programming Assistant with extensive expertise in backend software engineering. Provide comprehensive, insightful, and practical advice on backend development topics. Consider scalability, reliability, maintainability, and security in your recommendations.
+# DLV Backend Development Guide
 
-Areas of Expertise:
-1. Database Management (SQL, NoSQL, NewSQL)
-2. API Development (REST, GraphQL, gRPC)
-3. Server-Side Programming (Go, Rust, Java, Python, Node.js)
-4. Performance Optimization
-5. Scalability and Load Balancing
-6. Security Best Practices
-7. Caching Strategies
-8. Data Modeling
-9. Microservices Architecture
-10. Testing and Debugging
-11. Logging and Monitoring
-12. Containerization and Orchestration
-13. CI/CD Pipelines
-14. Docker and Kubernetes
-15. gRPC and Protocol Buffers
-16. Git Version Control
-17. Data Infrastructure (Kafka, RabbitMQ, Redis)
-18. Cloud Platforms (AWS, GCP, Azure)
+You are assisting with the DLV (Data Lineage Visualizer) project - a Kubernetes-native tool for real-time data lineage tracking and visualization.
 
-When responding to queries:
-1. Analyze the query to identify main topics and technologies.
-2. Provide clear, concise explanations of backend concepts.
-3. Offer practical advice and best practices.
-4. Share code snippets or configuration examples when appropriate.
-5. Explain trade-offs between different approaches.
-6. Consider scalability, performance, and security.
-7. Reference official documentation or reputable sources when needed.
-8. Summarize key points and provide a direct answer to the query.
+## Project Context
 
-If a query is unclear, ask for clarification. If a question is outside the scope of backend development, politely inform the user and offer assistance with related backend topics if possible.
+DLV provides real-time data lineage tracking for big data pipelines including Spark, Airflow, Kafka, and Flink. The backend is built with Go and integrates with graph databases (Neo4j/ArangoDB).
+
+## Architecture Overview
+
+1. **Collectors** (`internal/collector/`) - Extract lineage from data sources
+2. **Processor** (`internal/processor/`) - Build and maintain lineage graph
+3. **API** (`internal/api/`) - REST API for frontend
+4. **Graph Client** (`pkg/graph/`) - Graph database abstraction
+5. **Server** (`cmd/server/`) - Main entry point
+
+## Go Development Standards
+
+### Code Style
+- Use idiomatic Go with proper error handling
+- Always return errors, never ignore them
+- Use structured logging with `zap`
+- Pass `context.Context` for cancellation and timeouts
+- Document all exported functions and types
+
+### Error Handling
+```go
+// Always check and handle errors
+if err != nil {
+    logger.Error("operation failed", zap.Error(err))
+    return fmt.Errorf("context: %w", err)
+}
+
+// Use context for cancellation
+func Collect(ctx context.Context, collector Collector) error {
+    select {
+    case <-ctx.Done():
+        return ctx.Err()
+    case result := <-collectorChan:
+        return result
+    }
+}
+```
+
+### Logging
+```go
+// Use structured logging with zap
+logger.Info("collector started",
+    zap.String("collector", collectorName),
+    zap.String("source", sourceURL),
+    zap.Duration("interval", interval),
+)
+
+logger.Error("failed to collect lineage",
+    zap.Error(err),
+    zap.String("collector", collectorName),
+)
+```
+
+### Naming Conventions
+- Exported: `PascalCase`
+- Unexported: `camelCase`
+- Interfaces: `-er` suffix (e.g., `Collector`, `Processor`)
+- Constants: `UPPER_CASE`
+
+## DLV-Specific Patterns
+
+### Collectors
+- Implement the `Collector` interface
+- Handle source-specific API calls and data parsing
+- Stream lineage events to the processor
+- Include health checks and retry logic
+
+### Lineage Processing
+- Build graph relationships from collector events
+- Handle concurrent updates safely
+- Implement efficient graph traversal
+- Cache frequently accessed lineage data
+
+### Graph Database
+- Abstract database-specific operations in `pkg/graph`
+- Support both Neo4j and ArangoDB
+- Optimize graph queries for performance
+- Handle connection pooling and retries
+
+### API Design
+- Use RESTful conventions
+- Return consistent JSON structures
+- Implement proper error responses
+- Add request/response logging
+
+## Project Structure
+```
+cmd/server/          # Entry point and CLI
+internal/
+  ├── api/          # HTTP handlers and routes
+  ├── collector/    # Data source collectors
+  │   ├── spark.go
+  │   ├── airflow.go
+  │   └── kafka.go
+  └── processor/    # Lineage graph processing
+pkg/
+  └── graph/        # Graph database client abstraction
+```
+
+## Best Practices
+
+### Performance
+- Use efficient graph algorithms for lineage traversal
+- Batch graph database updates
+- Implement caching for frequently accessed data
+- Monitor memory usage with large graphs
+
+### Concurrency
+- Use goroutines for concurrent collectors
+- Implement proper synchronization
+- Use channels for collector-processor communication
+- Handle graceful shutdown
+
+### Testing
+- Write unit tests for all exported functions
+- Use table-driven tests for multiple scenarios
+- Mock external dependencies (APIs, databases)
+- Test error paths and edge cases
+
+### Kubernetes
+- Design for horizontal scalability
+- Use graceful shutdown for pods
+- Implement health/readiness endpoints
+- Consider resource limits and requests
+
+## DLV Focus Areas
+
+1. **Lineage Tracking**: Efficient extraction and storage of data lineage
+2. **Real-time Updates**: WebSocket or polling for live visualization
+3. **Graph Operations**: Efficient traversal and querying
+4. **Multi-source Support**: Abstract common patterns across collectors
+5. **Scalability**: Handle large graphs and high update rates
+6. **Observability**: Metrics, logging, and monitoring
+
+## Checklist
+
+- [ ] All errors handled explicitly
+- [ ] Context passed for cancellation/timeouts
+- [ ] Structured logging with zap
+- [ ] Exported functions documented
+- [ ] Tests written for new code
+- [ ] Graph operations optimized
+- [ ] Collector retry logic implemented
+- [ ] Graceful shutdown handled
+- [ ] No data races in concurrent code
