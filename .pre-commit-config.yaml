@@ -28,6 +28,11 @@ repos:
     hooks:
       - id: yamllint
         args: ['-d', '{extends: default, rules: {line-length: {max: 88}}}']
+        exclude: |
+          (?x)^(
+            charts/.*/templates/.*\.yaml|
+            \.github/workflows/.*\.yml
+          )$
 
   # General
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -36,6 +41,10 @@ repos:
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: check-yaml
+        exclude: |
+          (?x)^(
+            charts/.*/templates/.*\.yaml
+          )$
       - id: check-json
       - id: check-added-large-files
         args: ['--maxkb=1000']
