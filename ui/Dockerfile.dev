@@ -8,9 +8,9 @@ COPY package*.json ./
 # Install dependencies
 RUN npm install
 
-# Expose port
-EXPOSE 3000
+# Expose Vite default port
+EXPOSE 5173
 
-# Start development server
-CMD ["npm", "run", "dev", "--", "--host"]
+# Start development server with host flag
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
 

@@ -1,106 +1,67 @@
-.PHONY: help build run test clean docker-build docker-push install deps lint fmt
-
-# Variables
-DOCKER_REGISTRY ?= docker.io
-DOCKER_USERNAME ?= duynguyenngoc
-IMAGE_NAME ?= dlv
-VERSION ?= latest
-GIT_COMMIT ?= $(shell git rev-parse --short HEAD)
-BUILD_DATE ?= $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
-
-# Build info
-LDFLAGS = -X 'main.version=$(VERSION)' \
-          -X 'main.commit=$(GIT_COMMIT)' \
-          -X 'main.date=$(BUILD_DATE)'
+.PHONY: help dev up down restart logs clean build test
 
 help: ## Show this help message
 	@echo 'Usage: make [target]'
 	@echo ''
 	@echo 'Available targets:'
-	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  %-15s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
 
-deps: ## Install Go dependencies
-	@echo "Installing Go dependencies..."
-	@go mod download
-	@go mod tidy
+dev: ## Start development environment with docker-compose
+	docker-compose -f docker-compose.dev.yml up
 
-build: ## Build the Go binary
-	@echo "Building binary..."
-	@CGO_ENABLED=0 GOOS=linux go build -ldflags "$(LDFLAGS)" -o bin/dlv ./cmd/server
+up: dev ## Alias for dev
 
-run: ## Run the application locally
-	@echo "Running application..."
-	@go run ./cmd/server
+down: ## Stop development environment
+	docker-compose -f docker-compose.dev.yml down
+
+restart: ## Restart development environment
+	docker-compose -f docker-compose.dev.yml restart
+
+logs: ## Show logs from all services
+	docker-compose -f docker-compose.dev.yml logs -f
+
+logs-backend: ## Show backend logs
+	docker-compose -f docker-compose.dev.yml logs -f backend
+
+logs-frontend: ## Show frontend logs
+	docker-compose -f docker-compose.dev.yml logs -f frontend
+
+logs-neo4j: ## Show Neo4j logs
+	docker-compose -f docker-compose.dev.yml logs -f neo4j
+
+clean: ## Remove containers, volumes, and networks
+	docker-compose -f docker-compose.dev.yml down -v
+	docker system prune -f
+
+build: ## Build all services
+	docker-compose -f docker-compose.dev.yml build
 
 test: ## Run tests
-	@echo "Running tests..."
-	@go test -v ./...
+	go test ./...
 
-lint: ## Run linters
-	@echo "Running linters..."
-	@golangci-lint run
+test-backend: test ## Alias for test
 
-fmt: ## Format code
-	@echo "Formatting code..."
-	@go fmt ./...
+install-deps: ## Install backend dependencies
+	go mod download
 
-clean: ## Clean build artifacts
-	@echo "Cleaning..."
-	@rm -rf bin/
-	@rm -rf dist/
-	@rm -rf ui/dist/
+install-deps-ui: ## Install frontend dependencies
+	cd ui && npm install
 
-docker-build: ## Build Docker image
-	@echo "Building Docker image..."
-	@docker build -t $(DOCKER_REGISTRY)/$(DOCKER_USERNAME)/$(IMAGE_NAME):$(VERSION) .
-	@docker tag $(DOCKER_REGISTRY)/$(DOCKER_USERNAME)/$(IMAGE_NAME):$(VERSION) $(DOCKER_REGISTRY)/$(DOCKER_USERNAME)/$(IMAGE_NAME):latest
+# Local development without Docker
+dev-local-backend: ## Run backend locally (requires Go)
+	go run cmd/server/main.go \
+		--port 8080 \
+		--graphdb-url bolt://localhost:7687 \
+		--graphdb-user neo4j \
+		--graphdb-pass dlv-dev-password \
+		--log-level debug
 
-docker-build-binary: ## Build Docker image (binary only)
-	@echo "Building Docker image (binary only)..."
-	@docker build -f Dockerfile.binary -t $(DOCKER_REGISTRY)/$(DOCKER_USERNAME)/$(IMAGE_NAME):$(VERSION)-binary .
+dev-local-frontend: ## Run frontend locally (requires Node.js)
+	cd ui && npm run dev
 
-docker-push: ## Push Docker image
-	@echo "Pushing Docker image..."
-	@docker push $(DOCKER_REGISTRY)/$(DOCKER_USERNAME)/$(IMAGE_NAME):$(VERSION)
-	@docker push $(DOCKER_REGISTRY)/$(DOCKER_USERNAME)/$(IMAGE_NAME):latest
-
-install: deps build ## Install dependencies and build
-
-all: clean deps test build docker-build ## Run all: clean, deps, test, build, docker-build
-
-ui-install: ## Install UI dependencies
-	@echo "Installing UI dependencies..."
-	@cd ui && npm install
-
-ui-build: ## Build UI
-	@echo "Building UI..."
-	@cd ui && npm run build
-
-ui-dev: ## Run UI development server
-	@echo "Starting UI development server..."
-	@cd ui && npm run dev
-
-.PHONY: helm-package helm-lint helm-install helm-uninstall
-
-helm-package: ## Package Helm chart
-	@echo "Packaging Helm chart..."
-	@helm package charts/dlv
-
-helm-lint: ## Lint Helm chart
-	@echo "Linting Helm chart..."
-	@helm lint charts/dlv
-
-helm-install: ## Install Helm chart locally
-	@echo "Installing Helm chart..."
-	@helm install dlv charts/dlv --namespace lineage --create-namespace
-
-helm-uninstall: ## Uninstall Helm chart
-	@echo "Uninstalling Helm chart..."
-	@helm uninstall dlv --namespace lineage
-
-# Go dependencies
-go.mod: ## Generate go.mod and go.sum
-	@echo "Generating go modules..."
-	@go mod tidy
-	@go mod download
-	@go mod verify
+dev-local-neo4j: ## Start Neo4j locally with Docker
+	docker run -d \
+		--name dlv-neo4j-local \
+		-p 7474:7474 -p 7687:7687 \
+		-e NEO4J_AUTH=neo4j/dlv-dev-password \
+		neo4j:5-community

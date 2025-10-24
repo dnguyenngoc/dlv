@@ -1,9 +1,27 @@
-.cursor
+# Binaries
+bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+dlv
 
-# Helm
-charts/*/charts/
-charts/*/.tgz/
-*.tgz
+# Test binary
+*.test
+
+# Output of the go coverage tool
+*.out
+
+# Dependency directories
+vendor/
+
+# Go workspace file
+go.work
+
+# Environment files
+.env
+.env.local
 
 # IDE
 .idea/
@@ -16,27 +34,27 @@ charts/*/.tgz/
 .DS_Store
 Thumbs.db
 
-# Logs
-*.log
-logs/
+# Neo4j data
+neo4j-data/
+neo4j-logs/
 
-# Environment
-.env
-.env.local
+# Frontend
+ui/dist/
+ui/node_modules/
+ui/.vite/
 
-# Build artifacts
+# Build
 dist/
 build/
 
-# Dependencies
-node_modules/
-vendor/
+# Logs
+*.log
 
-# Test coverage
+# Coverage
 coverage/
-*.coverage
 
-# Temporary files
-tmp/
-temp/
+# Kubernetes
+kubeconfig
 
+# Docker
+.dockerignore
