@@ -22,6 +22,7 @@ type WebSocketHub struct {
 	unregister chan *Client
 }
 
+// NewWebSocketHub creates a new WebSocket hub instance
 func NewWebSocketHub() *WebSocketHub {
 	return &WebSocketHub{
 		clients:    make(map[*Client]bool),
@@ -31,6 +32,7 @@ func NewWebSocketHub() *WebSocketHub {
 	}
 }
 
+// Run starts the WebSocket hub goroutine to handle client connections
 func (h *WebSocketHub) Run() {
 	for {
 		select {
