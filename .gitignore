@@ -1,0 +1,40 @@
+# Helm
+charts/*/charts/
+charts/*/.tgz/
+*.tgz
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Environment
+.env
+.env.local
+
+# Build artifacts
+dist/
+build/
+
+# Dependencies
+node_modules/
+vendor/
+
+# Test coverage
+coverage/
+*.coverage
+
+# Temporary files
+tmp/
+temp/
+
