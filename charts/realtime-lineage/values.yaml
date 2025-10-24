@@ -11,6 +11,23 @@ image:
 nameOverride: ""
 fullnameOverride: ""
 
+# Service account
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+# Image pull secrets
+imagePullSecrets: []
+
+# Autoscaling configuration
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
 # Collector configuration
 collectors:
   # Apache Spark integration
@@ -129,10 +146,18 @@ persistence:
   size: 10Gi
 
 # Security context
-securityContext:
+podSecurityContext:
   runAsNonRoot: true
   runAsUser: 1000
   fsGroup: 1000
+
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
 
 # Node selector, tolerations, affinity
 nodeSelector: {}

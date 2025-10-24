@@ -4,6 +4,7 @@ description: A Helm chart for Real-time Data Lineage Visualizer - Track and visu
 type: application
 version: 0.1.0
 appVersion: "1.0.0"
+icon: https://raw.githubusercontent.com/dnguyenngoc/dlv/main/icon.png
 keywords:
   - data-lineage
   - real-time
