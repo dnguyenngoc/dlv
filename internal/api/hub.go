@@ -3,6 +3,8 @@ package api
 import (
 	"encoding/json"
 	"log"
+
+	"github.com/gorilla/websocket"
 )
 
 // Client represents a WebSocket client

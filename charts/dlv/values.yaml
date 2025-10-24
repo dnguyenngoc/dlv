@@ -4,15 +4,20 @@
 replicaCount: 1
 
 image:
-  # Docker image repository
-  # Examples:
-  #   docker.io/duynguyenngoc/dlv       # Docker Hub
-  #   ghcr.io/dnguyenngoc/dlv          # GitHub Container Registry
-  #   gcr.io/your-project/dlv          # Google Container Registry
-  #   your-registry.internal/dlv       # Private registry
   repository: docker.io/duynguyenngoc/dlv
   pullPolicy: IfNotPresent
   tag: "latest"
+
+# PostgreSQL configuration
+postgresql:
+  enabled: true
+  auth:
+    postgresPassword: "postgres"
+    database: "dlv"
+  primary:
+    persistence:
+      enabled: true
+      size: 10Gi
 
 nameOverride: ""
 fullnameOverride: ""
@@ -184,6 +189,20 @@ podLabels: {}
 env: []
   # - name: CUSTOM_VAR
   #   value: "value"
+
+# Database configuration
+database:
+  host: "postgresql"
+  port: 5432
+  user: "postgres"
+  password: "postgres"
+  name: "dlv"
+  sslMode: "disable"
+
+# Authentication configuration
+auth:
+  secretKey: "change-me-in-production"
+  jwtExpiration: 86400  # 24 hours
 
 # Probes
 livenessProbe:

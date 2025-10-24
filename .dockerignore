@@ -3,62 +3,64 @@
 .gitignore
 .gitattributes
 
-# Documentation
-README.md
-LICENSE
-docs/
-CHANGELOG.md
-CONTRIBUTING.md
-
 # CI/CD
-.github/
+.github
+.gitlab-ci.yml
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Helm
+charts
+*.tgz
 
 # IDE
-.idea/
-.vscode/
+.vscode
+.idea
 *.swp
 *.swo
+*~
 
 # OS
 .DS_Store
 Thumbs.db
 
-# Build artifacts
-dist/
-build/
-*.tgz
+# Documentation
+*.md
+!README.md
+docs
 
-# Go
+# Tests
+*_test.go
+test
+tests
+
+# Build artifacts
 *.exe
 *.exe~
 *.dll
 *.so
 *.dylib
 dlv
-dlv.exe
+dlv-*
 
-# Dependencies
-node_modules/
-vendor/
-
-# Environment
-.env
-.env.local
-
-# Logs
+# Temporary files
+tmp
+temp
+*.tmp
 *.log
-logs/
 
-# Test coverage
-coverage/
-*.coverage
+# Node (if present in root)
+node_modules
+npm-debug.log
+yarn-error.log
 
-# Examples
-examples/
+# Coverage
+coverage
+*.out
 
-# Helm charts
-charts/
-
-# Makefile
-Makefile
-
+# Backups
+*.backup
+*.bak

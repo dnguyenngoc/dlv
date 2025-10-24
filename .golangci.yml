@@ -1,0 +1,134 @@
+linters-settings:
+  govet:
+    check-shadowing: true
+  errcheck:
+    check-blank: true
+  gosimple:
+    checks: ["all"]
+  staticcheck:
+    checks: ["all"]
+  gosec:
+    severity: medium
+  misspell:
+    locale: US
+  revive:
+    rules:
+      - name: exported
+        severity: warning
+      - name: increment-decrement
+        severity: error
+      - name: var-naming
+        severity: error
+
+linters:
+  enable:
+    - errcheck
+    - gosimple
+    - govet
+    - ineffassign
+    - staticcheck
+    - unused
+    - golint
+    - gofmt
+    - goimports
+    - misspell
+    - revive
+    - gosec
+  disable:
+    - typecheck
+    - lll
+    - dupl
+    - interfacer
+    - maligned
+    - deadcode
+    - varcheck
+    - structcheck
+    - unconvert
+    - gas
+    - goconst
+    - scopelint
+    - gocritic
+    - godox
+    - goerr113
+    - dogsled
+    - nolintlint
+    - goheader
+    - nlreturn
+    - rowserr
+    - exhaustive
+    - forbidigo
+    - godot
+    - gofumpt
+    - gomodguard
+    - testpackage
+    - wrapcheck
+    - wastedassign
+    - gochecknoglobals
+    - wsl
+    - godotenv
+    - cyclop
+    - nestif
+    - prealloc
+    - revive
+    - thelper
+    - paralleltest
+    - tagliatelle
+    - unconvert
+    - unparam
+    - exhaustive
+    - gocyclo
+    - goimports
+    - ifshort
+    - revive
+    - cyclop
+    - errname
+    - errorlint
+    - exportloopref
+    - forbidigo
+    - gci
+    - gochecknoglobals
+    - gochecknoinits
+    - gocognit
+    - gocritic
+    - goheader
+    - golint
+    - gofmt
+    - goimports
+    - gomnd
+    - gomodguard
+    - goprintffuncname
+    - gosec
+    - gosimple
+    - govet
+    - ineffassign
+    - interfacer
+    - lll
+    - maintidx
+    - maligned
+    - misspell
+    - nakedret
+    - noctx
+    - nolintlint
+    - rowserr
+    - scopelint
+    - staticcheck
+    - structcheck
+    - stylecheck
+    - tagliatelle
+    - thelper
+    - tparallel
+    - typecheck
+    - unconvert
+    - unparam
+    - unused
+    - varcheck
+    - varnamelen
+    - whitespace
+    - wrapcheck
+    - wsl
+
+issues:
+  exclude-use-default: false
+  max-issues-per-linter: 0
+  max-same-issues: 0
+

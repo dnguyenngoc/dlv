@@ -1,23 +1,21 @@
 version: '3.8'
 
 services:
-  # Neo4j Graph Database
-  neo4j:
-    image: neo4j:5-community
-    container_name: dlv-neo4j
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: dlv-postgres
     ports:
-      - "7474:7474"  # HTTP
-      - "7687:7687"  # Bolt
+      - "5432:5432"
     environment:
-      - NEO4J_AUTH=neo4j/dlv-dev-password
-      - NEO4J_PLUGINS=["apoc"]
-      - NEO4J_dbms_memory_heap_initial__size=512m
-      - NEO4J_dbms_memory_heap_max__size=1G
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=dlv
     volumes:
-      - neo4j-data:/data
-      - neo4j-logs:/logs
+      - postgres-data:/var/lib/postgresql/data
+      - ./pkg/database/migrations:/docker-entrypoint-initdb.d
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:7474"]
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -33,14 +31,15 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - GRAPHDB_URL=bolt://neo4j:7687
-      - GRAPHDB_USER=neo4j
-      - GRAPHDB_PASS=dlv-dev-password
-      - SPARK_ENABLED=false
-      - SPARK_URL=http://spark-history:18080
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=dlv
+      - SECRET_KEY=dlv-dev-secret-key-change-in-production
       - LOG_LEVEL=debug
     depends_on:
-      neo4j:
+      postgres:
         condition: service_healthy
     volumes:
       - ./cmd:/app/cmd
@@ -51,12 +50,15 @@ services:
     networks:
       - dlv-network
     command: >
-      sh -c "go run ./cmd/server/main.go
-        --port 8080
-        --graphdb-url bolt://neo4j:7687
-        --graphdb-user neo4j
-        --graphdb-pass dlv-dev-password
-        --log-level debug"
+      go run ./cmd/server/main.go
+      --port 8080
+      --db-host postgres
+      --db-port 5432
+      --db-user postgres
+      --db-password postgres
+      --db-name dlv
+      --secret-key dlv-dev-secret-key-change-in-production
+      --log-level debug
 
   # Frontend Development Server
   frontend:
@@ -76,8 +78,7 @@ services:
     command: npm run dev -- --host
 
 volumes:
-  neo4j-data:
-  neo4j-logs:
+  postgres-data:
 
 networks:
   dlv-network:

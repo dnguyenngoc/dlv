@@ -1,51 +1,50 @@
-# Build stage for Go backend
-FROM golang:1.21-alpine AS backend-builder
+# Build stage
+FROM golang:1.21-alpine AS builder
 
 # Install build dependencies
-RUN apk add --no-cache git make
+RUN apk add --no-cache git make gcc musl-dev
 
 WORKDIR /build
 
-# Copy go mod files first for better caching
+# Copy go mod files
 COPY go.mod go.sum ./
+
+# Download dependencies
 RUN go mod download
 
 # Copy source code
 COPY . .
 
-# Build the binary
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o dlv ./cmd/server
-
-# Build stage for frontend
-FROM node:18-alpine AS frontend-builder
-
-WORKDIR /build
-
-# Copy frontend files
-COPY ui/package*.json ./
-RUN npm ci
-
-COPY ui/ ./
-RUN npm run build
+# Build the application
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o dlv ./cmd/server/main.go
 
 # Final stage
 FROM alpine:latest
 
+# Install ca-certificates for HTTPS
 RUN apk --no-cache add ca-certificates tzdata
 
 WORKDIR /app
 
-# Copy backend binary
-COPY --from=backend-builder /build/dlv .
+# Copy binary from builder
+COPY --from=builder /build/dlv .
 
-# Copy frontend static files
-COPY --from=frontend-builder /build/dist ./ui/dist
+# Copy migrations
+COPY --from=builder /build/pkg/database/migrations ./migrations
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:8080/health || exit 1
+# Create non-root user
+RUN addgroup -g 1000 dlv && \
+    adduser -D -u 1000 -G dlv dlv && \
+    chown -R dlv:dlv /app
 
+USER dlv
+
+# Expose port
 EXPOSE 8080
 
-CMD ["./dlv"]
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:8080/health || exit 1
 
+# Run the application
+CMD ["./dlv"]

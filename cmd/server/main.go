@@ -10,9 +10,10 @@ import (
 	"time"
 
 	"github.com/dnguyenngoc/dlv/internal/api"
-	"github.com/dnguyenngoc/dlv/internal/collector"
-	"github.com/dnguyenngoc/dlv/internal/processor"
-	"github.com/dnguyenngoc/dlv/pkg/graph"
+	"github.com/dnguyenngoc/dlv/internal/auth"
+	"github.com/dnguyenngoc/dlv/internal/repository"
+	"github.com/dnguyenngoc/dlv/pkg/database"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
@@ -40,22 +41,24 @@ var rootCmd = &cobra.Command{
 
 var (
 	port         int
-	graphDBURL   string
-	graphDBUser  string
-	graphDBPass  string
+	dbHost       string
+	dbPort       int
+	dbUser       string
+	dbPassword   string
+	dbName       string
+	secretKey    string
 	logLevel     string
-	sparkEnabled bool
-	sparkURL     string
 )
 
 func init() {
 	rootCmd.Flags().IntVarP(&port, "port", "p", 8080, "Server port")
-	rootCmd.Flags().StringVar(&graphDBURL, "graphdb-url", "bolt://neo4j:7687", "Graph database URL")
-	rootCmd.Flags().StringVar(&graphDBUser, "graphdb-user", "neo4j", "Graph database username")
-	rootCmd.Flags().StringVar(&graphDBPass, "graphdb-pass", "", "Graph database password")
+	rootCmd.Flags().StringVar(&dbHost, "db-host", "localhost", "Database host")
+	rootCmd.Flags().IntVar(&dbPort, "db-port", 5432, "Database port")
+	rootCmd.Flags().StringVar(&dbUser, "db-user", "postgres", "Database username")
+	rootCmd.Flags().StringVar(&dbPassword, "db-password", "postgres", "Database password")
+	rootCmd.Flags().StringVar(&dbName, "db-name", "dlv", "Database name")
+	rootCmd.Flags().StringVar(&secretKey, "secret-key", "", "JWT secret key")
 	rootCmd.Flags().StringVar(&logLevel, "log-level", "info", "Log level (debug, info, warn, error)")
-	rootCmd.Flags().BoolVar(&sparkEnabled, "spark-enabled", false, "Enable Spark collector")
-	rootCmd.Flags().StringVar(&sparkURL, "spark-url", "http://spark-history:18080", "Spark History Server URL")
 }
 
 func runServer(cmd *cobra.Command, args []string) {
@@ -69,33 +72,44 @@ func runServer(cmd *cobra.Command, args []string) {
 		zap.String("date", date),
 	)
 
-	// Initialize graph database
-	graphDB, err := graph.NewNeo4jClient(graphDBURL, graphDBUser, graphDBPass)
+	// Initialize database
+	dbConfig := database.Config{
+		Host:     dbHost,
+		Port:     dbPort,
+		User:     dbUser,
+		Password: dbPassword,
+		DBName:   dbName,
+		SSLMode:  "disable",
+	}
+
+	db, err := database.NewPostgres(dbConfig, logger)
 	if err != nil {
-		logger.Fatal("Failed to connect to graph database", zap.Error(err))
+		logger.Fatal("Failed to connect to database", zap.Error(err))
 	}
-	defer graphDB.Close()
+	defer db.Close()
 
-	// Initialize collectors
-	collectors := make([]collector.Collector, 0)
-	if sparkEnabled {
-		sparkCollector := collector.NewSparkCollector(sparkURL, logger)
-		collectors = append(collectors, sparkCollector)
-		logger.Info("Spark collector enabled", zap.String("url", sparkURL))
-	}
+	// Initialize auth service
+	authService := auth.NewAuthService(secretKey)
 
-	// Initialize processor
-	proc := processor.NewLineageProcessor(graphDB, logger)
-	go proc.Start(context.Background())
-
-	// Start collectors
-	for _, c := range collectors {
-		go c.Start(context.Background(), proc)
-	}
+	// Initialize repositories
+	userRepo := repository.NewUserRepository(db.DB, logger)
 
 	// Initialize API server
 	router := gin.Default()
-	api.SetupRoutes(router, proc, logger)
+	
+	// Configure CORS
+	config := cors.DefaultConfig()
+	config.AllowOrigins = []string{"http://localhost:5173", "http://localhost:3000"}
+	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"}
+	config.AllowHeaders = []string{"Origin", "Content-Type", "Content-Length", "Accept-Encoding", "X-CSRF-Token", "Authorization", "accept", "origin", "Cache-Control", "X-Requested-With"}
+	config.AllowCredentials = true
+	router.Use(cors.New(config))
+	
+	// Setup auth routes
+	api.SetupAuthRoutes(router, authService, userRepo, logger)
+	
+	// Setup other routes (lineage, etc.)
+	api.SetupRoutes(router, nil, logger)
 
 	// Start HTTP server
 	srv := &http.Server{

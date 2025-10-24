@@ -1,7 +1,6 @@
 package api
 
 import (
-	"github.com/dnguyenngoc/dlv/internal/processor"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -14,7 +13,8 @@ func init() {
 }
 
 // SetupRoutes configures API routes
-func SetupRoutes(router *gin.Engine, proc processor.Processor, logger *zap.Logger) {
+func SetupRoutes(router *gin.Engine, proc interface{}, logger *zap.Logger) {
+	// Routes will be configured here later
 	api := router.Group("/api/v1")
 
 	// Health check

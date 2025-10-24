@@ -13,9 +13,19 @@ keywords:
   - airflow
   - kafka
   - bigdata
+  - kubernetes
+  - helm
+  - authentication
+  - rbac
 maintainers:
   - name: Data Lineage Visualizer Team
-home: https://github.com/dnguyenngoc/dlp
+    email: dev@dlv.local
+home: https://github.com/dnguyenngoc/dlv
 sources:
   - https://github.com/dnguyenngoc/dlv
+dependencies:
+  - name: postgresql
+    version: "~12.0.0"
+    repository: "https://charts.bitnami.com/bitnami"
+    condition: postgresql.enabled
 
