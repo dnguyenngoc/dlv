@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: 'latest'
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v3
+
+      - name: Lint Helm Chart
+        run: helm lint charts/realtime-lineage
+
+      - name: Validate Chart Schema
+        run: |
+          helm dependency update charts/realtime-lineage
+          helm package charts/realtime-lineage
+
+      - name: Dry Run Install
+        run: |
+          helm install dlv ./charts/realtime-lineage \
+            --namespace lineage \
+            --create-namespace \
+            --dry-run \
+            --debug
+
+      - name: Check YAML files
+        run: |
+          find . -name "*.yaml" -o -name "*.yml" | grep -v "./charts/" | while read file; do
+            echo "Checking $file"
+            python3 -c "import yaml; yaml.safe_load(open('$file'))"
+          done
+

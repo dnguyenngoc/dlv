@@ -1,0 +1,40 @@
+name: Lint Helm Chart
+
+on:
+  pull_request:
+    paths:
+      - 'charts/**'
+      - '.github/workflows/lint.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'charts/**'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: 'latest'
+
+      - name: Run Helm Lint
+        run: |
+          helm lint charts/realtime-lineage
+
+      - name: Validate Chart
+        run: |
+          helm dependency update charts/realtime-lineage
+          helm package charts/realtime-lineage
+
+      - name: Check YAML syntax
+        uses: ibiqlik/action-yamllint@v3
+        with:
+          file_or_dir: charts
+          config_file: .yamllint.yml
+
