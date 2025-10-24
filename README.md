@@ -167,41 +167,41 @@ open http://localhost:3000
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    Data Sources                              │
-│  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐       │
-│  │  Spark  │  │ Airflow │  │  Kafka  │  │  Flink  │       │
-│  └────┬────┘  └────┬────┘  └────┬────┘  └────┬────┘       │
+│                    Data Sources                             │
+│  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐         │
+│  │  Spark  │  │ Airflow │  │  Kafka  │  │  Flink  │         │
+│  └────┬────┘  └────┬────┘  └────┬────┘  └────┬────┘         │
 └───────┼────────────┼────────────┼────────────┼──────────────┘
         │            │            │            │
         ▼            ▼            ▼            ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                     Collectors                             │
-│  Parsing logs, metrics, API responses                      │
-│  Extracting lineage information                            │
+│                     Collectors                              │
+│  Parsing logs, metrics, API responses                       │
+│  Extracting lineage information                             │
 └────────────────────────┬────────────────────────────────────┘
                          │
                          ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                Lineage Processor                           │
-│  - Build graph relationships                              │
-│  - Real-time updates                                      │
-│  - Impact analysis                                        │
-│  - Anomaly detection                                      │
+│                Lineage Processor                            │
+│  - Build graph relationships                                │
+│  - Real-time updates                                        │
+│  - Impact analysis                                          │
+│  - Anomaly detection                                        │
 └────────────────────────┬────────────────────────────────────┘
                          │
                          ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                  Graph Database                            │
-│  Neo4j / ArangoDB                                         │
-│  Store lineage relationships                              │
+│                  Graph Database                             │
+│  Neo4j / ArangoDB                                           │
+│  Store lineage relationships                                │
 └────────────────────────┬────────────────────────────────────┘
                          │
                          ▼
 ┌─────────────────────────────────────────────────────────────┐
 │                     Frontend                                │
-│  React + D3.js / Cytoscape.js                             │
-│  Interactive visualization                                 │
-│  Real-time updates via WebSocket                          │
+│  React + D3.js / Cytoscape.js                               │
+│  Interactive visualization                                  │
+│  Real-time updates via WebSocket                            │
 └─────────────────────────────────────────────────────────────┘
 ```
 
