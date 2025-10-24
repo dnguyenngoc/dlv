@@ -41,7 +41,7 @@ collectors:
     enabled: true
     historyServerUrl: "http://spark-history-server:18080"
     refreshInterval: 5s
-    
+
   # Apache Airflow integration
   airflow:
     enabled: true
@@ -49,13 +49,13 @@ collectors:
     username: "admin"
     password: ""
     refreshInterval: 10s
-    
+
   # Apache Kafka integration
   kafka:
     enabled: true
     brokers: "kafka:9092"
     refreshInterval: 5s
-    
+
   # Apache Flink integration
   flink:
     enabled: true
@@ -78,7 +78,7 @@ processor:
       username: "root"
       password: ""
       database: "lineage"
-  
+
   # Auto-discovery settings
   autoDiscover:
     enabled: true
@@ -87,10 +87,10 @@ processor:
       - airflow
       - kafka
       - flink
-  
+
   # Lineage tracking depth
   maxDepth: 10
-  
+
   # Real-time update interval
   updateInterval: 5s
 
@@ -105,14 +105,14 @@ frontend:
     repository: docker.io/duynguyenngoc/dlv-ui
     pullPolicy: IfNotPresent
     tag: "latest"
-  
+
   # Graph visualization settings
   visualization:
     layout: "force-directed"  # force-directed, hierarchical, circular
     nodeSize: "auto"  # auto, fixed
     showLabels: true
     animationSpeed: 500
-    
+
   # Features
   features:
     realtimeUpdates: true

@@ -3,7 +3,7 @@
 collectors:
   spark:
     enabled: false
-  
+
   airflow:
     enabled: true
     apiUrl: "http://airflow-webserver:8080"
@@ -12,10 +12,10 @@ collectors:
     refreshInterval: 10s
     trackHistoricalRuns: true
     maxHistoricalDays: 30
-  
+
   kafka:
     enabled: false
-  
+
   flink:
     enabled: false
 
@@ -27,28 +27,28 @@ processor:
       username: "root"
       password: "changeme"
       database: "airflow_lineage"
-  
+
   autoDiscover:
     enabled: true
     sources:
       - airflow
-  
+
   maxDepth: 20
-  
+
   updateInterval: 10s
-  
+
   impactAnalysis:
     enabled: true
     maxImpactDepth: 10
 
 frontend:
   enabled: true
-  
+
   visualization:
     layout: "force-directed"
     nodeSize: "auto"
     showLabels: true
-  
+
   features:
     realtimeUpdates: true
     timelineView: true

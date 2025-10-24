@@ -4,19 +4,19 @@
 collectors:
   spark:
     enabled: true
-    
+
     # Multiple Spark History Servers
     historyServers:
       - name: "production"
         url: "http://spark-history-prod:18080"
       - name: "staging"
         url: "http://spark-history-staging:18080"
-    
+
     refreshInterval: 5s
-  
+
   airflow:
     enabled: true
-    
+
     # Multiple Airflow instances
     instances:
       - name: "production"
@@ -25,24 +25,24 @@ collectors:
       - name: "staging"
         apiUrl: "http://airflow-staging:8080"
         username: "admin"
-    
+
     refreshInterval: 10s
-  
+
   kafka:
     enabled: true
-    
+
     # Multiple Kafka clusters
     clusters:
       - name: "production"
         brokers: "kafka-prod:9092"
       - name: "staging"
         brokers: "kafka-staging:9092"
-    
+
     refreshInterval: 5s
-  
+
   flink:
     enabled: true
-    
+
     # Multiple Flink clusters
     clusters:
       - name: "production"
@@ -51,7 +51,7 @@ collectors:
       - name: "staging"
         restHost: "flink-staging-jobmanager"
         restPort: 8081
-    
+
     refreshInterval: 5s
 
 processor:
@@ -62,7 +62,7 @@ processor:
       username: "neo4j"
       password: "changeme"
       database: "multi_cluster_lineage"
-  
+
   autoDiscover:
     enabled: true
     sources:
@@ -70,31 +70,31 @@ processor:
       - airflow
       - kafka
       - flink
-  
+
   # Cross-cluster lineage tracking
   crossClusterTracking: true
-  
+
   maxDepth: 20
   updateInterval: 5s
 
 frontend:
   enabled: true
-  
+
   visualization:
     layout: "force-directed"
     showLabels: true
-    
+
     # Cluster colors
     clusterColors:
       production: "#ff0000"
       staging: "#00ff00"
-  
+
   features:
     realtimeUpdates: true
     streamingMode: true
     whatIfAnalysis: true
     impactAnalysis: true
-    
+
     # Multi-cluster features
     clusterFilter: true
     crossClusterDependencies: true

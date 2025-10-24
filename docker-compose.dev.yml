@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  # Neo4j Graph Database
+  neo4j:
+    image: neo4j:5-community
+    container_name: dlv-neo4j
+    ports:
+      - "7474:7474"  # HTTP
+      - "7687:7687"  # Bolt
+    environment:
+      - NEO4J_AUTH=neo4j/dlv-dev-password
+      - NEO4J_PLUGINS=["apoc"]
+      - NEO4J_dbms_memory_heap_initial__size=512m
+      - NEO4J_dbms_memory_heap_max__size=1G
+    volumes:
+      - neo4j-data:/data
+      - neo4j-logs:/logs
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:7474"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend API Server
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dlv-backend
+    ports:
+      - "8080:8080"
+    environment:
+      - GRAPHDB_URL=bolt://neo4j:7687
+      - GRAPHDB_USER=neo4j
+      - GRAPHDB_PASS=dlv-dev
+      - SPARK_ENABLED=false
+      - SPARK_URL=http://spark-history:18080
+      - LOG_LEVEL=debug
+    depends_on:
+      neo4j:
+        condition: service_healthy
+    volumes:
+      - ./cmd:/app/cmd
+      - ./internal:/app/internal
+      - ./pkg:/app/pkg
+    command: go run ./cmd/server
+
+  # Frontend Development Server
+  frontend:
+    build:
+      context: ./ui
+      dockerfile: Dockerfile.dev
+    container_name: dlv-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=http://localhost:8080
+    volumes:
+      - ./ui:/app
+      - /app/node_modules
+    command: npm run dev
+
+volumes:
+  neo4j-data:
+  neo4j-logs:
+
+networks:
+  default:
+    name: dlv-network
+

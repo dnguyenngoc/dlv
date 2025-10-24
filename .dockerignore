@@ -1,0 +1,64 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+README.md
+LICENSE
+docs/
+CHANGELOG.md
+CONTRIBUTING.md
+
+# CI/CD
+.github/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+dist/
+build/
+*.tgz
+
+# Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+dlv
+dlv.exe
+
+# Dependencies
+node_modules/
+vendor/
+
+# Environment
+.env
+.env.local
+
+# Logs
+*.log
+logs/
+
+# Test coverage
+coverage/
+*.coverage
+
+# Examples
+examples/
+
+# Helm charts
+charts/
+
+# Makefile
+Makefile
+

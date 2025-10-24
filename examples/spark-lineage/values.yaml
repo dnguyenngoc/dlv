@@ -5,13 +5,13 @@ collectors:
     enabled: true
     historyServerUrl: "http://spark-history-server:18080"
     refreshInterval: 5s
-  
+
   airflow:
     enabled: false
-  
+
   kafka:
     enabled: false
-  
+
   flink:
     enabled: false
 
@@ -23,23 +23,23 @@ processor:
       username: "neo4j"
       password: "changeme"
       database: "spark_lineage"
-  
+
   autoDiscover:
     enabled: true
     sources:
       - spark
-  
+
   maxDepth: 15
-  
+
   updateInterval: 5s
 
 frontend:
   enabled: true
-  
+
   visualization:
     layout: "hierarchical"
     showLabels: true
-  
+
   features:
     realtimeUpdates: true
     whatIfAnalysis: true

@@ -41,14 +41,14 @@ image:
 docker login
 
 # Build and push
-docker build -t yourusername/dlv:latest .
-docker push yourusername/dlv:latest
+docker build -t duynguyenngoc/dlv:latest .
+docker push duynguyenngoc/dlv:latest
 ```
 
 **Values.yaml:**
 ```yaml
 image:
-  repository: docker.io/yourusername/dlv
+  repository: docker.io/duynguyenngoc/dlv
 ```
 
 ### 3. Google Container Registry (GCR)
