@@ -55,11 +55,16 @@ DLV (Data Lineage Visualizer) is a lightweight Kubernetes-native tool that provi
 
 ### Prerequisites
 
+**For Production:**
 - Kubernetes cluster (v1.24+)
 - Helm 3.x
-- Neo4j or ArangoDB (for graph storage)
+- PostgreSQL or Neo4j (for storage)
 
-### Installation
+**For Development:**
+- Docker and Docker Compose
+- OR Go 1.24+ and Node.js 18+
+
+### Installation (Production)
 
 #### Option 1: Install with default values
 
@@ -88,17 +93,10 @@ collectors:
     enabled: true
     apiUrl: "http://airflow:8080"
 
-  kafka:
-    enabled: true
-    brokers: "kafka:9092"
-
-processor:
-  graphdb:
-    provider: "neo4j"
-    neo4j:
-      url: "bolt://neo4j:7687"
-      username: "neo4j"
-      password: "your-password"
+database:
+  host: "postgresql"
+  user: "postgres"
+  password: "your-password"
 
 frontend:
   enabled: true
@@ -131,6 +129,61 @@ kubectl port-forward -n lineage svc/dlv-dlv 3000:3000
 # Open browser
 open http://localhost:3000
 ```
+
+### Development Setup
+
+The easiest way to start development is using Docker Compose:
+
+```bash
+# Start all services
+docker-compose up
+
+# Services will be available at:
+# - Frontend: http://localhost:5173
+# - Backend API: http://localhost:8080
+# - PostgreSQL: localhost:5432
+```
+
+#### Local Development (Without Docker)
+
+**1. Start PostgreSQL:**
+
+```bash
+docker run -d \
+  --name dlv-postgres \
+  -p 5432:5432 \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=postgres \
+  -e POSTGRES_DB=dlv \
+  postgres:15-alpine
+```
+
+**2. Install Dependencies:**
+
+```bash
+# Backend
+go mod download
+
+# Frontend
+cd ui && npm install
+```
+
+**3. Start Services:**
+
+**Terminal 1 - Backend:**
+```bash
+go run ./cmd/server/main.go
+```
+
+**Terminal 2 - Frontend:**
+```bash
+cd ui && npm run dev
+```
+
+Access:
+- Frontend: http://localhost:5173
+- Backend API: http://localhost:8080
+- Health Check: http://localhost:8080/health
 
 ## 📋 Supported Integrations
 
@@ -191,18 +244,45 @@ open http://localhost:3000
                          │
                          ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                  Graph Database                             │
-│  Neo4j / ArangoDB                                           │
-│  Store lineage relationships                                │
+│                  Database (PostgreSQL)                      │
+│  Store lineage relationships and metadata                   │
 └────────────────────────┬────────────────────────────────────┘
                          │
                          ▼
 ┌─────────────────────────────────────────────────────────────┐
 │                     Frontend                                │
-│  React + D3.js / Cytoscape.js                               │
+│  React + Cytoscape.js                                       │
 │  Interactive visualization                                  │
 │  Real-time updates via WebSocket                            │
 └─────────────────────────────────────────────────────────────┘
+```
+
+## 📁 Project Structure
+
+```
+dlv/
+├── cmd/server/          # Main entry point
+├── internal/
+│   ├── api/            # HTTP API and WebSocket handlers
+│   ├── auth/           # Authentication and authorization
+│   ├── collector/      # Data source collectors
+│   ├── processor/      # Lineage graph processor
+│   ├── repository/     # Database repositories
+│   └── middleware/     # HTTP middleware
+├── pkg/
+│   ├── database/       # Database client and migrations
+│   └── models/         # Data models
+├── ui/                 # React frontend
+│   ├── src/
+│   │   ├── components/ # UI components
+│   │   ├── pages/      # Page components
+│   │   ├── api/        # API client
+│   │   └── types/      # TypeScript types
+│   └── package.json
+├── charts/             # Helm charts
+├── docs/               # Documentation
+├── docker-compose.yml  # Development environment
+└── Makefile            # Build automation
 ```
 
 ## 🔧 Configuration
@@ -230,26 +310,28 @@ collectors:
     saslEnabled: false
 ```
 
-### Graph Database Configuration
+### Database Configuration
 
-Choose your graph database backend:
+PostgreSQL database settings:
 
 ```yaml
-processor:
-  graphdb:
-    provider: "neo4j"  # or "arangodb"
+database:
+  host: "postgresql"
+  port: 5432
+  user: "postgres"
+  password: "your-password"
+  name: "dlv"
+  sslMode: "disable"
+```
 
-    neo4j:
-      url: "bolt://neo4j:7687"
-      username: "neo4j"
-      password: "password"
-      database: "lineage"
+### Authentication Configuration
 
-    arangodb:
-      url: "http://arangodb:8529"
-      username: "root"
-      password: "password"
-      database: "lineage"
+JWT-based authentication:
+
+```yaml
+auth:
+  secretKey: "your-secret-key"
+  jwtExpiration: 86400  # 24 hours
 ```
 
 ### Frontend Configuration
@@ -301,9 +383,8 @@ See [docs/configuration.md](docs/configuration.md) for complete configuration op
 
 See the [examples/](examples/) directory for complete examples including:
 
-- [Spark streaming pipeline](examples/spark-streaming/)
-- [Airflow DAG tracking](examples/airflow-dags/)
-- [Kafka-based ETL](examples/kafka-etl/)
+- [Spark lineage tracking](examples/spark-lineage/)
+- [Airflow DAG tracking](examples/airflow-lineage/)
 - [Multi-cluster setup](examples/multi-cluster/)
 
 ## 📊 Metrics & Monitoring
@@ -316,6 +397,24 @@ DLV exposes Prometheus metrics:
 - `dlv_graph_edges`: Number of edges in the graph
 - `dlv_collector_errors`: Collector errors
 
+## 🔍 API Endpoints
+
+### Health & Status
+- `GET /health` - Health check
+- `GET /ready` - Readiness check
+
+### Authentication
+- `POST /api/v1/auth/login` - User login
+- `POST /api/v1/auth/register` - User registration
+
+### Lineage
+- `GET /api/v1/lineage/graph` - Get full lineage graph
+- `GET /api/v1/lineage/nodes` - Get all nodes
+- `GET /api/v1/lineage/nodes/:id` - Get node details
+- `GET /api/v1/lineage/edges` - Get all edges
+- `GET /api/v1/lineage/search?q=query` - Search lineage
+- `WS /ws/lineage` - WebSocket for real-time updates
+
 ## 🤝 Contributing
 
 We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details.
@@ -327,7 +426,10 @@ We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for deta
 git clone https://github.com/dnguyenngoc/dlv.git
 cd dlv
 
-# Install dependencies
+# Start development environment
+docker-compose up
+
+# Or install dependencies
 make deps
 
 # Run tests
@@ -337,6 +439,70 @@ make test
 make helm-build
 ```
 
+### Useful Commands
+
+```bash
+# View logs
+docker-compose logs -f
+
+# View specific service logs
+docker-compose logs -f backend
+docker-compose logs -f frontend
+
+# Stop services
+docker-compose down
+
+# Rebuild services
+docker-compose up --build
+
+# Clean everything (removes volumes)
+docker-compose down -v
+```
+
+## 🐛 Troubleshooting
+
+### Port Already in Use
+
+```bash
+# Check what's using the port
+lsof -i :8080  # Backend
+lsof -i :5173  # Frontend
+lsof -i :5432  # PostgreSQL
+
+# Stop conflicting service or change port in docker-compose.yml
+```
+
+### Database Connection Failed
+
+```bash
+# Check PostgreSQL status
+docker ps | grep postgres
+
+# View PostgreSQL logs
+docker-compose logs postgres
+
+# Restart PostgreSQL
+docker-compose restart postgres
+```
+
+### Frontend Not Loading
+
+1. Check backend is running: `curl http://localhost:8080/health`
+2. Check `VITE_API_URL` in browser console
+3. Check browser console for errors
+4. Try hard refresh (Ctrl+Shift+R)
+
+### Docker Build Fails
+
+```bash
+# Clean build
+docker-compose down -v
+docker-compose up --build
+
+# Or rebuild specific service
+docker-compose build --no-cache backend
+```
+
 ## 📄 License
 
 This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
@@ -344,8 +510,8 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 ## 🙏 Acknowledgments
 
 - Inspired by [DataHub](https://datahubproject.io/) and [OpenLineage](https://openlineage.io/)
-- Built with [Neo4j](https://neo4j.com/) and [ArangoDB](https://www.arangodb.com/)
-- Visualization powered by [D3.js](https://d3js.org/) and [Cytoscape.js](https://js.cytoscape.org/)
+- Built with [PostgreSQL](https://www.postgresql.org/) and [Neo4j](https://neo4j.com/)
+- Visualization powered by [React](https://react.dev/) and [Cytoscape.js](https://js.cytoscape.org/)
 
 ## 📞 Support
 

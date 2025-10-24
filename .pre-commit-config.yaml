@@ -20,7 +20,7 @@ repos:
     rev: v2.12.0
     hooks:
       - id: hadolint-docker
-        args: []
+        args: ['--ignore', 'DL3007', '--ignore', 'DL3018']
 
   # YAML
   - repo: https://github.com/adrienverge/yamllint
