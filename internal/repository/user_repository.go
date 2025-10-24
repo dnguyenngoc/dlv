@@ -127,7 +127,9 @@ func (r *UserRepository) GetAllUsers() ([]*models.User, error) {
 		r.logger.Error("Failed to get all users", zap.Error(err))
 		return nil, fmt.Errorf("failed to get users: %w", err)
 	}
-	defer rows.Close()
+	defer func() {
+		_ = rows.Close()
+	}()
 	
 	var users []*models.User
 	for rows.Next() {

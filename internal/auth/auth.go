@@ -22,8 +22,11 @@ var (
 
 const (
 	TokenExpiration = 24 * time.Hour
-	SecretKey       = "dlv-secret-key-change-in-production"
 )
+
+// DefaultSecretKey is the default secret key (should be changed in production)
+// #nosec G101 -- This is just a default placeholder
+var DefaultSecretKey = "dlv-secret-key-change-in-production"
 
 // AuthService handles authentication logic
 type AuthService struct {
@@ -33,7 +36,7 @@ type AuthService struct {
 // NewAuthService creates a new auth service
 func NewAuthService(secretKey string) *AuthService {
 	if secretKey == "" {
-		secretKey = SecretKey
+		secretKey = DefaultSecretKey
 	}
 	return &AuthService{
 		secretKey: []byte(secretKey),

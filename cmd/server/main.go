@@ -86,7 +86,9 @@ func runServer(cmd *cobra.Command, args []string) {
 	if err != nil {
 		logger.Fatal("Failed to connect to database", zap.Error(err))
 	}
-	defer db.Close()
+	defer func() {
+		_ = db.Close()
+	}()
 
 	// Initialize auth service
 	authService := auth.NewAuthService(secretKey)
@@ -113,8 +115,9 @@ func runServer(cmd *cobra.Command, args []string) {
 
 	// Start HTTP server
 	srv := &http.Server{
-		Addr:    fmt.Sprintf(":%d", port),
-		Handler: router,
+		Addr:              fmt.Sprintf(":%d", port),
+		Handler:           router,
+		ReadHeaderTimeout: 5 * time.Second,
 	}
 
 	go func() {
@@ -140,6 +143,7 @@ func runServer(cmd *cobra.Command, args []string) {
 	}
 
 	logger.Info("Server exited")
+	_ = logger.Sync()
 }
 
 func initLogger(level string) *zap.Logger {
