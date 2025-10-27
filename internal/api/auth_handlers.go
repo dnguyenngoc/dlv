@@ -18,7 +18,8 @@ type AuthHandlers struct {
 }
 
 // NewAuthHandlers creates new auth handlers
-func NewAuthHandlers(authService *auth.Service, userRepo *repository.UserRepository, logger *zap.Logger) *AuthHandlers {
+func NewAuthHandlers(authService *auth.Service, userRepo *repository.UserRepository,
+	logger *zap.Logger) *AuthHandlers {
 	return &AuthHandlers{
 		authService: authService,
 		userRepo:    userRepo,
@@ -30,21 +31,24 @@ func NewAuthHandlers(authService *auth.Service, userRepo *repository.UserReposit
 func (h *AuthHandlers) Login(c *gin.Context) {
 	var req models.LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request", "details": err.Error()})
+		c.JSON(http.StatusBadRequest,
+			gin.H{"error": "Invalid request", "details": err.Error()})
 		return
 	}
 
 	// Get user by username
 	user, err := h.userRepo.GetUserByUsername(req.Username)
 	if err != nil {
-		h.logger.Warn("Login attempt failed - user not found", zap.String("username", req.Username))
+		h.logger.Warn("Login attempt failed - user not found",
+			zap.String("username", req.Username))
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
 		return
 	}
 
 	// Verify password
 	if !h.authService.VerifyPassword(req.Password, user.PasswordHash) {
-		h.logger.Warn("Login attempt failed - invalid password", zap.String("username", req.Username))
+		h.logger.Warn("Login attempt failed - invalid password",
+			zap.String("username", req.Username))
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
 		return
 	}
@@ -70,7 +74,8 @@ func (h *AuthHandlers) Login(c *gin.Context) {
 func (h *AuthHandlers) Register(c *gin.Context) {
 	var req models.RegisterRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request", "details": err.Error()})
+		c.JSON(http.StatusBadRequest,
+			gin.H{"error": "Invalid request", "details": err.Error()})
 		return
 	}
 
@@ -78,7 +83,8 @@ func (h *AuthHandlers) Register(c *gin.Context) {
 	exists, err := h.userRepo.UserExists(req.Username, req.Email)
 	if err != nil {
 		h.logger.Error("Failed to check user existence", zap.Error(err))
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to check user existence"})
+		c.JSON(http.StatusInternalServerError,
+			gin.H{"error": "Failed to check user existence"})
 		return
 	}
 	if exists {

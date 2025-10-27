@@ -44,7 +44,8 @@ func (r *UserRepository) CreateUser(user *models.User) error {
 // GetUserByID retrieves a user by ID
 func (r *UserRepository) GetUserByID(id int) (*models.User, error) {
 	user := &models.User{}
-	query := `SELECT id, username, email, password_hash, role, created_at, updated_at FROM users WHERE id = $1`
+	query := `SELECT id, username, email, password_hash, role, created_at, updated_at
+		FROM users WHERE id = $1`
 
 	err := r.db.QueryRow(query, id).Scan(
 		&user.ID, &user.Username, &user.Email, &user.PasswordHash,
@@ -65,7 +66,8 @@ func (r *UserRepository) GetUserByID(id int) (*models.User, error) {
 // GetUserByUsername retrieves a user by username
 func (r *UserRepository) GetUserByUsername(username string) (*models.User, error) {
 	user := &models.User{}
-	query := `SELECT id, username, email, password_hash, role, created_at, updated_at FROM users WHERE username = $1`
+	query := `SELECT id, username, email, password_hash, role, created_at, updated_at
+		FROM users WHERE username = $1`
 
 	err := r.db.QueryRow(query, username).Scan(
 		&user.ID, &user.Username, &user.Email, &user.PasswordHash,
@@ -86,7 +88,8 @@ func (r *UserRepository) GetUserByUsername(username string) (*models.User, error
 // GetUserByEmail retrieves a user by email
 func (r *UserRepository) GetUserByEmail(email string) (*models.User, error) {
 	user := &models.User{}
-	query := `SELECT id, username, email, password_hash, role, created_at, updated_at FROM users WHERE email = $1`
+	query := `SELECT id, username, email, password_hash, role, created_at, updated_at
+		FROM users WHERE email = $1`
 
 	err := r.db.QueryRow(query, email).Scan(
 		&user.ID, &user.Username, &user.Email, &user.PasswordHash,
@@ -120,7 +123,8 @@ func (r *UserRepository) UserExists(username, email string) (bool, error) {
 
 // GetAllUsers retrieves all users
 func (r *UserRepository) GetAllUsers() ([]*models.User, error) {
-	query := `SELECT id, username, email, password_hash, role, created_at, updated_at FROM users ORDER BY created_at DESC`
+	query := `SELECT id, username, email, password_hash, role, created_at, updated_at
+		FROM users ORDER BY created_at DESC`
 
 	rows, err := r.db.Query(query)
 	if err != nil {
@@ -128,7 +132,9 @@ func (r *UserRepository) GetAllUsers() ([]*models.User, error) {
 		return nil, fmt.Errorf("failed to get users: %w", err)
 	}
 	defer func() {
-		_ = rows.Close()
+		if err := rows.Close(); err != nil {
+			r.logger.Error("Error closing rows", zap.Error(err))
+		}
 	}()
 
 	var users []*models.User

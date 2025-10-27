@@ -40,7 +40,8 @@ func HandleWebSocket(c *gin.Context) {
 		return
 	}
 
-	// Allow collection of memory referenced by the caller by doing all work in new goroutines
+	// Allow collection of memory referenced by the caller by doing all work in
+	// new goroutines
 	go client.writePump()
 	go client.readPump()
 }
@@ -48,19 +49,28 @@ func HandleWebSocket(c *gin.Context) {
 func (c *Client) readPump() {
 	defer func() {
 		c.hub.unregister <- c
-		_ = c.conn.Close()
+		if err := c.conn.Close(); err != nil {
+			log.Printf("Error closing connection: %v", err)
+		}
 	}()
 
-	_ = c.conn.SetReadDeadline(time.Now().Add(60 * time.Second))
+	if err := c.conn.SetReadDeadline(time.Now().Add(60 * time.Second)); err != nil {
+		log.Printf("Error setting read deadline: %v", err)
+		return
+	}
 	c.conn.SetPongHandler(func(string) error {
-		_ = c.conn.SetReadDeadline(time.Now().Add(60 * time.Second))
+		if err := c.conn.SetReadDeadline(time.Now().Add(60 * time.Second)); err != nil {
+			log.Printf("Error setting read deadline: %v", err)
+			return err
+		}
 		return nil
 	})
 
 	for {
 		_, _, err := c.conn.ReadMessage()
 		if err != nil {
-			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
+			if websocket.IsUnexpectedCloseError(err,
+				websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				log.Printf("WebSocket error: %v", err)
 			}
 			break
@@ -72,39 +82,71 @@ func (c *Client) writePump() {
 	ticker := time.NewTicker(30 * time.Second)
 	defer func() {
 		ticker.Stop()
-		_ = c.conn.Close()
+		if err := c.conn.Close(); err != nil {
+			log.Printf("Error closing connection: %v", err)
+		}
 	}()
 
 	for {
 		select {
 		case message, ok := <-c.send:
-			_ = c.conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
-			if !ok {
-				_ = c.conn.WriteMessage(websocket.CloseMessage, []byte{})
+			if !c.handleMessage(message, ok) {
 				return
 			}
-
-			w, err := c.conn.NextWriter(websocket.TextMessage)
-			if err != nil {
-				return
-			}
-			_, _ = w.Write(message)
-
-			n := len(c.send)
-			for i := 0; i < n; i++ {
-				_, _ = w.Write([]byte{'\n'})
-				_, _ = w.Write(<-c.send)
-			}
-
-			if err := w.Close(); err != nil {
-				return
-			}
-
 		case <-ticker.C:
-			_ = c.conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
-			if err := c.conn.WriteMessage(websocket.PingMessage, nil); err != nil {
+			if !c.handlePing() {
 				return
 			}
 		}
 	}
+}
+
+func (c *Client) handleMessage(message []byte, ok bool) bool {
+	if err := c.conn.SetWriteDeadline(time.Now().Add(10 * time.Second)); err != nil {
+		log.Printf("Error setting write deadline: %v", err)
+		return false
+	}
+	if !ok {
+		if err := c.conn.WriteMessage(websocket.CloseMessage, []byte{}); err != nil {
+			log.Printf("Error writing close message: %v", err)
+		}
+		return false
+	}
+
+	w, err := c.conn.NextWriter(websocket.TextMessage)
+	if err != nil {
+		return false
+	}
+	if _, err := w.Write(message); err != nil {
+		log.Printf("Error writing message: %v", err)
+		return false
+	}
+
+	n := len(c.send)
+	for i := 0; i < n; i++ {
+		if _, err := w.Write([]byte{'\n'}); err != nil {
+			log.Printf("Error writing newline: %v", err)
+			return false
+		}
+		if _, err := w.Write(<-c.send); err != nil {
+			log.Printf("Error writing queued message: %v", err)
+			return false
+		}
+	}
+
+	if err := w.Close(); err != nil {
+		return false
+	}
+	return true
+}
+
+func (c *Client) handlePing() bool {
+	if err := c.conn.SetWriteDeadline(time.Now().Add(10 * time.Second)); err != nil {
+		log.Printf("Error setting write deadline: %v", err)
+		return false
+	}
+	if err := c.conn.WriteMessage(websocket.PingMessage, nil); err != nil {
+		return false
+	}
+	return true
 }

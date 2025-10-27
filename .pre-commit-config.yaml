@@ -7,20 +7,16 @@ repos:
       - id: golangci-lint
         args: ['--config', '.golangci.yml']
         files: \.go$
-        additional_dependencies: [go@1.24.5]
 
   # Additional Go tools
   - repo: https://github.com/dnephin/pre-commit-golang
     rev: v0.5.1
     hooks:
       - id: go-fmt
-        additional_dependencies: [go@1.24.5]
       - id: validate-toml
       - id: no-go-testing
       - id: go-mod-tidy
-        additional_dependencies: [go@1.24.5]
       - id: go-unit-tests
-        additional_dependencies: [go@1.24.5]
 
   # Docker
   - repo: https://github.com/hadolint/hadolint

@@ -35,8 +35,9 @@ func main() {
 var rootCmd = &cobra.Command{
 	Use:   "dlv",
 	Short: "Data Lineage Visualizer - Real-time data lineage tracking",
-	Long:  "DLV provides real-time data lineage tracking and visualization for big data pipelines",
-	Run:   runServer,
+	Long: "DLV provides real-time data lineage tracking and visualization for " +
+		"big data pipelines",
+	Run: runServer,
 }
 
 var (
@@ -58,14 +59,17 @@ func init() {
 	rootCmd.Flags().StringVar(&dbPassword, "db-password", "postgres", "Database password")
 	rootCmd.Flags().StringVar(&dbName, "db-name", "dlv", "Database name")
 	rootCmd.Flags().StringVar(&secretKey, "secret-key", "", "JWT secret key")
-	rootCmd.Flags().StringVar(&logLevel, "log-level", "info", "Log level (debug, info, warn, error)")
+	rootCmd.Flags().StringVar(&logLevel, "log-level", "info",
+		"Log level (debug, info, warn, error)")
 }
 
 func runServer(cmd *cobra.Command, args []string) {
 	// Initialize logger
 	logger := initLogger(logLevel)
 	defer func() {
-		_ = logger.Sync()
+		if err := logger.Sync(); err != nil {
+			fmt.Fprintf(os.Stderr, "Error syncing logger: %v\n", err)
+		}
 	}()
 
 	logger.Info("Starting DLV server",
@@ -89,7 +93,9 @@ func runServer(cmd *cobra.Command, args []string) {
 		logger.Fatal("Failed to connect to database", zap.Error(err))
 	}
 	defer func() {
-		_ = db.Close()
+		if err := db.Close(); err != nil {
+			logger.Error("Error closing database", zap.Error(err))
+		}
 	}()
 
 	// Initialize auth service
@@ -105,7 +111,11 @@ func runServer(cmd *cobra.Command, args []string) {
 	config := cors.DefaultConfig()
 	config.AllowOrigins = []string{"http://localhost:5173", "http://localhost:3000"}
 	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"}
-	config.AllowHeaders = []string{"Origin", "Content-Type", "Content-Length", "Accept-Encoding", "X-CSRF-Token", "Authorization", "accept", "origin", "Cache-Control", "X-Requested-With"}
+	config.AllowHeaders = []string{
+		"Origin", "Content-Type", "Content-Length", "Accept-Encoding",
+		"X-CSRF-Token", "Authorization", "accept", "origin",
+		"Cache-Control", "X-Requested-With",
+	}
 	config.AllowCredentials = true
 	router.Use(cors.New(config))
 
