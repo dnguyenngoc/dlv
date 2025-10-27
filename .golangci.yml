@@ -1,4 +1,7 @@
----
+run:
+  timeout: 5m
+  go: '1.24'
+
 linters-settings:
   errcheck:
     check-blank: true
@@ -10,6 +13,10 @@ linters-settings:
     severity: medium
   misspell:
     locale: US
+  gocyclo:
+    min-complexity: 15
+  lll:
+    line-length: 88
 
 linters:
   enable:
@@ -23,12 +30,13 @@ linters:
     - goimports
     - misspell
     - gosec
+    - gocyclo
+    - lll
   disable:
     - typecheck
     - dupl
     - interfacer
     - maligned
-    - lll
     - golint
     - revive
 
