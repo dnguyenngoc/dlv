@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { LineageGraph, SearchResult, Node } from '../types'
+import { LineageGraph, SearchResult, Node, Edge } from '../types'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1'
 
@@ -21,7 +21,7 @@ export const lineageApi = {
     return response.data
   },
 
-  getEdges: async (): Promise<any[]> => {
+  getEdges: async (): Promise<Edge[]> => {
     const response = await client.get('/lineage/edges')
     return response.data
   },

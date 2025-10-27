@@ -1,5 +1,5 @@
-import { useEffect, useState, useRef } from 'react'
-import { LineageGraph, Node, Edge } from '../types'
+import { useEffect, useState } from 'react'
+import { LineageGraph, Node } from '../types'
 import { lineageApi } from '../api/client'
 import { GraphVisualization } from '../components/GraphVisualization'
 import { NodeDetailsPanel } from '../components/NodeDetailsPanel'

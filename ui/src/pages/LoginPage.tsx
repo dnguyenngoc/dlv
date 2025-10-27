@@ -30,8 +30,9 @@ export function LoginPage() {
 
       // Redirect to home
       navigate('/')
-    } catch (err: any) {
-      setError(err.response?.data?.error || 'Login failed')
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { error?: string } } }
+      setError(error.response?.data?.error || 'Login failed')
     } finally {
       setLoading(false)
     }

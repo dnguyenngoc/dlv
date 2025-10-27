@@ -2,8 +2,8 @@ export interface Node {
   id: string
   label: string
   type: 'table' | 'transformation' | 'topic' | 'view'
-  metadata?: Record<string, any>
-  properties?: Record<string, any>
+  metadata?: Record<string, unknown>
+  properties?: Record<string, unknown>
 }
 
 export interface Edge {
@@ -11,7 +11,7 @@ export interface Edge {
   source: string
   target: string
   type: 'reads' | 'writes' | 'transforms' | 'dependsOn'
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 }
 
 export interface LineageGraph {
