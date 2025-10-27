@@ -28,6 +28,7 @@ DLV provides real-time data lineage tracking for big data pipelines including Sp
 - Use structured logging with `zap`
 - Pass `context.Context` for cancellation and timeouts
 - Document all exported functions and types
+- Keep lines under 88 characters for readability
 
 ### Error Handling
 ```go
@@ -116,6 +117,7 @@ pkg/
 - Batch graph database updates
 - Implement caching for frequently accessed data
 - Monitor memory usage with large graphs
+- Keep code lines under 88 characters for better readability
 
 ### Concurrency
 - Use goroutines for concurrent collectors
@@ -155,3 +157,4 @@ pkg/
 - [ ] Collector retry logic implemented
 - [ ] Graceful shutdown handled
 - [ ] No data races in concurrent code
+- [ ] Lines kept under 88 characters
