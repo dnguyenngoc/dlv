@@ -3,9 +3,13 @@ import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import './LoginPage.css'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1'
+const API_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:8080/api/v1'
 
-export function LoginPage() {
+interface LoginPageProps {
+  onLogin?: () => void
+}
+
+export function LoginPage({ onLogin }: LoginPageProps) {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -27,6 +31,11 @@ export function LoginPage() {
       // Store token
       localStorage.setItem('token', response.data.token)
       localStorage.setItem('user', JSON.stringify(response.data.user))
+
+      // Notify parent component about successful login
+      if (onLogin) {
+        onLogin()
+      }
 
       // Redirect to home
       navigate('/')

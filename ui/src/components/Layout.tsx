@@ -5,14 +5,13 @@ import './Layout.css'
 
 interface LayoutProps {
   children: ReactNode
+  onLogout?: () => void
 }
 
-export function Layout({ children }: LayoutProps) {
+export function Layout({ children, onLogout }: LayoutProps) {
   return (
     <div className="layout">
-      <Header />
       <div className="layout-body">
-        <Sidebar />
         <main className="layout-content">{children}</main>
       </div>
     </div>

@@ -1,57 +1,39 @@
 import { useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import './Sidebar.css'
 
 export function Sidebar() {
   const [isOpen, setIsOpen] = useState(true)
+  const location = useLocation()
+
+  const navigationItems = [
+    { path: '/', label: 'Dashboard', icon: '📊' },
+    { path: '/lineage', label: 'Lineage View', icon: '🔗' },
+    { path: '/search', label: 'Search', icon: '🔍' },
+  ]
 
   return (
     <aside className={`sidebar ${isOpen ? 'open' : 'closed'}`}>
       <div className="sidebar-header">
-        <h3>Filters</h3>
+        <h3>DLV</h3>
         <button className="toggle-btn" onClick={() => setIsOpen(!isOpen)}>
           {isOpen ? '←' : '→'}
         </button>
       </div>
       {isOpen && (
         <div className="sidebar-content">
-          <div className="filter-group">
-            <label>Node Type</label>
-            <div className="checkbox-group">
-              <label>
-                <input type="checkbox" defaultChecked />
-                Table
-              </label>
-              <label>
-                <input type="checkbox" defaultChecked />
-                Transformation
-              </label>
-              <label>
-                <input type="checkbox" defaultChecked />
-                Topic
-              </label>
-              <label>
-                <input type="checkbox" defaultChecked />
-                View
-              </label>
-            </div>
-          </div>
-          <div className="filter-group">
-            <label>Edge Type</label>
-            <div className="checkbox-group">
-              <label>
-                <input type="checkbox" defaultChecked />
-                Reads
-              </label>
-              <label>
-                <input type="checkbox" defaultChecked />
-                Writes
-              </label>
-              <label>
-                <input type="checkbox" defaultChecked />
-                Transforms
-              </label>
-            </div>
-          </div>
+          <nav className="sidebar-nav">
+            {navigationItems.map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`nav-item ${location.pathname === item.path ? 'active' : ''}`}
+              >
+                <span className="nav-icon">{item.icon}</span>
+                <span className="nav-label">{item.label}</span>
+              </Link>
+            ))}
+          </nav>
         </div>
       )}
     </aside>

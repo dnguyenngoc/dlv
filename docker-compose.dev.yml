@@ -1,9 +1,11 @@
-# Production Docker Compose for DLV
+# Development Docker Compose - Backend + Database only
+# Frontend runs locally with: npm run dev
+
 services:
   # PostgreSQL Database
   postgres:
     image: postgres:15-alpine
-    container_name: dlv-postgres
+    container_name: dlv-postgres-dev
     ports:
       - "5432:5432"
     environment:
@@ -26,7 +28,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: dlv-backend
+      args:
+        MODE: dev
+    container_name: dlv-backend-dev
     ports:
       - "8080:8080"
     environment:
@@ -35,26 +39,29 @@ services:
       - DB_USER=postgres
       - DB_PASSWORD=postgres
       - DB_NAME=dlv
-      - SECRET_KEY=dlv-prod-secret-key-change-in-production
-      - LOG_LEVEL=info
+      - SECRET_KEY=dlv-dev-secret-key-change-in-production
+      - LOG_LEVEL=debug
     depends_on:
       postgres:
         condition: service_healthy
+    volumes:
+      - ./cmd:/app/cmd
+      - ./internal:/app/internal
+      - ./pkg:/app/pkg
+      - ./go.mod:/app/go.mod
+      - ./go.sum:/app/go.sum
     networks:
       - dlv-network
-
-  # Frontend Production Server
-  frontend:
-    build:
-      context: ./ui
-      dockerfile: Dockerfile
-    container_name: dlv-frontend
-    ports:
-      - "80:80"
-    depends_on:
-      - backend
-    networks:
-      - dlv-network
+    command: >
+      go run ./cmd/server/main.go
+      --port 8080
+      --db-host postgres
+      --db-port 5432
+      --db-user postgres
+      --db-password postgres
+      --db-name dlv
+      --secret-key dlv-dev-secret-key-change-in-production
+      --log-level debug
 
 volumes:
   postgres-data:
