@@ -19,6 +19,20 @@ client.interceptors.request.use((config) => {
   return config
 })
 
+// Handle auth errors
+client.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Token expired or invalid, redirect to login
+      localStorage.removeItem('token')
+      localStorage.removeItem('user')
+      window.location.href = '/login'
+    }
+    return Promise.reject(error)
+  }
+)
+
 interface Dashboard {
   id: string
   name: string
@@ -61,6 +75,66 @@ export const lineageApi = {
     const response = await client.get(`/lineage/nodes/${nodeId}`)
     return response.data
   },
+
+  // Source management APIs
+      getSources: async (): Promise<any[]> => {
+        try {
+          const response = await client.get('/sources')
+          return response.data
+        } catch (error) {
+          console.warn('Sources API not available, returning empty array')
+          return []
+        }
+      },
+
+  createSource: async (source: any): Promise<any> => {
+    try {
+      const response = await client.post('/sources', source)
+      return response.data
+    } catch (error) {
+      console.error('Failed to create source:', error)
+      throw error
+    }
+  },
+
+  updateSource: async (id: number, source: any): Promise<any> => {
+    try {
+      const response = await client.put(`/sources/${id}`, source)
+      return response.data
+    } catch (error) {
+      console.error('Failed to update source:', error)
+      throw error
+    }
+  },
+
+  deleteSource: async (id: number): Promise<void> => {
+    try {
+      await client.delete(`/sources/${id}`)
+    } catch (error) {
+      console.error('Failed to delete source:', error)
+      throw error
+    }
+  },
+
+      testSourceConnection: async (connectionData: any): Promise<any> => {
+        try {
+          const response = await client.post('/sources/test', connectionData)
+          return response.data
+        } catch (error) {
+          console.error('Failed to test connection:', error)
+          throw error
+        }
+      },
+
+      analyzeDatabase: async (sourceId: number): Promise<any> => {
+        try {
+          const response = await client.post(`/sources/${sourceId}/analyze`)
+          return response.data
+        } catch (error) {
+          console.error('Failed to analyze database:', error)
+          throw error
+        }
+      },
 
   // Dashboard management APIs
   getDashboards: async (): Promise<Dashboard[]> => {

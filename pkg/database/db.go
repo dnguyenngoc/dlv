@@ -7,11 +7,14 @@ import (
 
 	_ "github.com/lib/pq" // PostgreSQL driver
 	"go.uber.org/zap"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
-// DB wraps sql.DB with logger
+// DB wraps sql.DB with logger and GORM
 type DB struct {
 	*sql.DB
+	GORM   *gorm.DB
 	logger *zap.Logger
 }
 
@@ -47,13 +50,19 @@ func NewPostgres(config Config, logger *zap.Logger) (*DB, error) {
 	db.SetMaxIdleConns(5)
 	db.SetConnMaxLifetime(5 * time.Minute)
 
+	// Create GORM connection
+	gormDB, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		return nil, fmt.Errorf("failed to create GORM connection: %w", err)
+	}
+
 	logger.Info("Database connection established",
 		zap.String("host", config.Host),
 		zap.Int("port", config.Port),
 		zap.String("database", config.DBName),
 	)
 
-	return &DB{DB: db, logger: logger}, nil
+	return &DB{DB: db, GORM: gormDB, logger: logger}, nil
 }
 
 // RunMigrations runs database migrations

@@ -2,9 +2,12 @@ package auth
 
 import (
 	"errors"
+	"net/http"
+	"strings"
 	"time"
 
 	"github.com/dnguyenngoc/dlv/pkg/models"
+	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -120,4 +123,55 @@ func (s *Service) GetUserRoleFromToken(claims jwt.MapClaims) (string, error) {
 		return "", ErrInvalidToken
 	}
 	return role, nil
+}
+
+// AuthMiddleware creates a Gin middleware for JWT authentication
+func (s *Service) AuthMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Get token from Authorization header
+		authHeader := c.GetHeader("Authorization")
+		if authHeader == "" {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization header required"})
+			c.Abort()
+			return
+		}
+
+		// Check if header starts with "Bearer "
+		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
+		if tokenString == authHeader {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Bearer token required"})
+			c.Abort()
+			return
+		}
+
+		// Validate token
+		claims, err := s.ValidateToken(tokenString)
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+			c.Abort()
+			return
+		}
+
+		// Extract user ID and role
+		userID, err := s.GetUserIDFromToken(claims)
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token claims"})
+			c.Abort()
+			return
+		}
+
+		role, err := s.GetUserRoleFromToken(claims)
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token claims"})
+			c.Abort()
+			return
+		}
+
+		// Set user info in context
+		c.Set("user_id", userID)
+		c.Set("username", claims["username"])
+		c.Set("role", role)
+
+		c.Next()
+	}
 }

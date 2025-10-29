@@ -1,17 +1,13 @@
-export interface Node {
+export interface DataSource {
   id: string
-  label: string
-  type: 'table' | 'transformation' | 'topic' | 'view'
-  metadata?: Record<string, unknown>
-  properties?: Record<string, unknown>
-}
-
-export interface Edge {
-  id: string
-  source: string
-  target: string
-  type: 'reads' | 'writes' | 'transforms' | 'dependsOn'
-  metadata?: Record<string, unknown>
+  name: string
+  type: 'spark' | 'kafka' | 'airflow' | 'database' | 'custom'
+  connectionString?: string
+  username?: string
+  password?: string
+  description?: string
+  status: 'connected' | 'disconnected' | 'error' | 'pending'
+  lastSync: string
 }
 
 export interface LineageGraph {
@@ -19,19 +15,24 @@ export interface LineageGraph {
   edges: Edge[]
 }
 
-export interface SparkJob {
-  appId: string
-  name: string
-  startTime: number
-  endTime?: number
-  status: string
-  tablesRead: string[]
-  tablesWritten: string[]
+export interface Node {
+  id: string
+  type: string
+  label: string
+  data: any
+  position: { x: number; y: number }
+}
+
+export interface Edge {
+  id: string
+  source: string
+  target: string
+  type: string
+  data: any
 }
 
 export interface SearchResult {
   nodes: Node[]
   edges: Edge[]
-  totalNodes: number
-  totalEdges: number
+  total: number
 }

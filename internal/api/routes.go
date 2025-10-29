@@ -1,6 +1,8 @@
 package api
 
 import (
+	"github.com/dnguyenngoc/dlv/internal/auth"
+	"github.com/dnguyenngoc/dlv/pkg/handlers"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -38,6 +40,31 @@ func SetupRoutes(router *gin.Engine, proc interface{}, logger *zap.Logger) {
 	// Serve static files
 	router.StaticFile("/", "./ui/dist/index.html")
 	router.Static("/static", "./ui/dist/static")
+}
+
+// SetupSourceRoutes configures source management API routes
+func SetupSourceRoutes(
+	router *gin.Engine,
+	sourceHandler *handlers.SourceHandler,
+	authService *auth.Service,
+	logger *zap.Logger,
+) {
+	api := router.Group("/api/v1")
+
+	// Test connection endpoint (public - no auth required)
+	api.POST("/sources/test", sourceHandler.TestConnection)
+
+	// Source management endpoints (protected)
+	sources := api.Group("/sources")
+	sources.Use(authService.AuthMiddleware())
+	{
+		sources.POST("", sourceHandler.CreateSource)
+		sources.GET("", sourceHandler.GetSources)
+		sources.GET("/:id", sourceHandler.GetSource)
+		sources.PUT("/:id", sourceHandler.UpdateSource)
+		sources.DELETE("/:id", sourceHandler.DeleteSource)
+		sources.POST("/:id/analyze", sourceHandler.AnalyzeDatabase)
+	}
 }
 
 func getLineageGraph(c *gin.Context) {

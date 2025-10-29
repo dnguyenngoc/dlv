@@ -13,6 +13,8 @@ import (
 	"github.com/dnguyenngoc/dlv/internal/auth"
 	"github.com/dnguyenngoc/dlv/internal/repository"
 	"github.com/dnguyenngoc/dlv/pkg/database"
+	"github.com/dnguyenngoc/dlv/pkg/handlers"
+	"github.com/dnguyenngoc/dlv/pkg/services"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
@@ -104,6 +106,12 @@ func runServer(cmd *cobra.Command, args []string) {
 	// Initialize repositories
 	userRepo := repository.NewUserRepository(db.DB, logger)
 
+	// Initialize services
+	sourceService := services.NewSourceService(db.GORM)
+
+	// Initialize handlers
+	sourceHandler := handlers.NewSourceHandler(sourceService)
+
 	// Initialize API server
 	router := gin.Default()
 
@@ -121,6 +129,9 @@ func runServer(cmd *cobra.Command, args []string) {
 
 	// Setup auth routes
 	api.SetupAuthRoutes(router, authService, userRepo, logger)
+
+	// Setup source routes
+	api.SetupSourceRoutes(router, sourceHandler, authService, logger)
 
 	// Setup other routes (lineage, etc.)
 	api.SetupRoutes(router, nil, logger)
