@@ -1,60 +1,20 @@
-# Binaries
-bin/
-*.exe
-*.exe~
-*.dll
-*.so
-*.dylib
-dlv
+# Node
+ui/node_modules/
+ui/dist/
 
-# Test binary
-*.test
+# Python
+backend/.venv/
+backend/__pycache__/
+backend/.mypy_cache/
+backend/.pytest_cache/
+backend/.ruff_cache/
+backend/backend.egg-info/
 
-# Output of the go coverage tool
-*.out
-
-# Dependency directories
-vendor/
-
-# Go workspace file
-go.work
-
-# Environment files
+# Environment
 .env
-.env.local
 
-# IDE
-.idea/
-.vscode/
-*.swp
-*.swo
-*~
+# Docker
+*.log
 
 # OS
 .DS_Store
-Thumbs.db
-
-# Neo4j data
-neo4j-data/
-neo4j-logs/
-
-# Frontend
-ui/dist/
-ui/node_modules/
-ui/.vite/
-
-# Build
-dist/
-build/
-
-# Logs
-*.log
-
-# Coverage
-coverage/
-
-# Kubernetes
-kubeconfig
-
-# Docker
-.dockerignore

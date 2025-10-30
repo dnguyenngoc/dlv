@@ -1,55 +1,23 @@
----
+default_install_hook_types:
+  - pre-commit
+  - post-checkout
+  - post-merge
+  - post-rewrite
+
 repos:
-  # Go linting with golangci-lint
-  - repo: https://github.com/golangci/golangci-lint
-    rev: v1.64.8
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.11.13
     hooks:
-      - id: golangci-lint
-        args: ['--config', '.golangci.yml']
-        files: \.go$
+      - id: ruff-check
+        args: ["--config", "backend/pyproject.toml", "--fix"]
+      - id: ruff-format
+        args: ["--config", "backend/pyproject.toml"]
 
-  # Additional Go tools
-  - repo: https://github.com/dnephin/pre-commit-golang
-    rev: v0.5.1
-    hooks:
-      - id: go-fmt
-      - id: validate-toml
-      - id: no-go-testing
-      - id: go-mod-tidy
-      - id: go-unit-tests
-
-  # Docker
-  - repo: https://github.com/hadolint/hadolint
-    rev: v2.12.0
-    hooks:
-      - id: hadolint-docker
-        args: ['--ignore', 'DL3007', '--ignore', 'DL3018']
-
-  # YAML
-  - repo: https://github.com/adrienverge/yamllint
-    rev: v1.33.0
-    hooks:
-      - id: yamllint
-        args: ['-d', '{extends: default, rules: {line-length: {max: 88}}}']
-        exclude: |
-          (?x)^(
-            charts/.*/templates/.*\.yaml|
-            \.github/workflows/.*\.yml
-          )$
-
-  # General
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v4.6.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
-      - id: check-yaml
-        exclude: |
-          (?x)^(
-            charts/.*/templates/.*\.yaml
-          )$
-      - id: check-json
-      - id: check-added-large-files
-        args: ['--maxkb=1000']
       - id: check-merge-conflict
-      - id: check-case-conflict
+      - id: check-yaml
+      - id: check-json

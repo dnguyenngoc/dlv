@@ -1,164 +1,110 @@
-# 🔍 Data Lineage Visualizer (DLV)
+# DLV (Data Lineage Visualizer)
 
-_A modern, real-time data lineage visualization tool for big data pipelines_
+DLV is a tool to observe and visualize data lineage across systems
+(Spark, Airflow, PostgreSQL/MySQL, etc.) with near real-time monitoring goals.
 
-## 🎯 What is DLV?
+This repository currently contains the Backend (FastAPI) with JWT auth (admin/viewer roles).
+The UI will be added in later phases (React Flow + D3).
 
-DLV (Data Lineage Visualizer) provides **real-time data lineage tracking and visualization** for your big data infrastructure. Unlike traditional tools that show lineage after jobs complete, DLV visualizes data flow **while it's happening**.
+## Architecture (from PLAN.md)
 
-## ✨ Key Features
+- Backend: FastAPI (Python 3.12), SQLAlchemy, JWT
+- Task Queue: Celery + Redis (planned next phases)
+- Databases: PostgreSQL (metadata), Neo4j (lineage graph, planned), Redis (cache/queue)
+- Frontend: React 24 + TypeScript + React Flow (planned)
+- Real-time: WebSocket (planned)
 
-- **🔴 Real-Time Tracking**: See data flow as it happens
-- **🎨 Interactive Dashboard**: React Flow visualization with custom nodes
-- **📊 Live Metrics**: Charts and analytics for throughput, health, distribution
-- **🔗 Auto-Discovery**: Automatically discovers Spark, Airflow, Kafka, Flink jobs
-- **🚨 Anomaly Detection**: Identifies unusual patterns and bottlenecks
+## Repository Structure (MVP)
 
-## 🚀 Quick Start
+```
+./
+├── backend/                 # FastAPI backend
+│   ├── app/
+│   │   ├── api/
+│   │   │   └── routes/      # auth endpoints (login, me, create user)
+│   │   ├── core/            # config, database
+│   │   ├── models/          # SQLAlchemy models (User)
+│   │   └── schemas/         # Pydantic schemas (Auth/User)
+│   ├── main.py              # FastAPI app entry
+│   ├── pyproject.toml       # Python deps (via uv)
+│   ├── Dockerfile           # API container (uv + uvicorn)
+│   └── docker-compose.yaml  # API + Postgres (dev)
+├── .pre-commit-config.yaml  # Ruff lint/format hooks
+├── PLAN.md                  # Detailed implementation plan (high-level roadmap)
+└── README.md                # You are here
+```
 
-### Development Setup (Recommended)
+## Prerequisites
 
+- Python 3.12
+- uv (Python package/dependency manager): https://docs.astral.sh/uv/
+- Docker & Docker Compose (optional but recommended for local DB)
+
+Install uv:
 ```bash
-# 1. Start backend + database
-./dev-start.sh
-
-# 2. In a new terminal, start frontend
-cd ui
-npm run dev
+pip install -U uv
+# or with pipx
+pipx install uv
 ```
 
-**Access URLs:**
-- Frontend: http://localhost:5173
-- Backend API: http://localhost:8080
-- PostgreSQL: localhost:5432
-
-### Production Setup
-
+Enable pre-commit hooks:
 ```bash
-# Build and start all services
-docker-compose up --build
-
-# Access production app
-open http://localhost:80
+cd backend
+uv run pre-commit install
 ```
 
-## 🎨 Dashboard Features
+## Start Backend (simplest)
 
-### Interactive Visualization
-- **Custom Nodes**: Spark, Kafka, Airflow, Database nodes with real-time status
-- **Animated Edges**: Data flow visualization with throughput metrics
-- **Filtering**: Search, node types, status, time ranges
-- **Charts**: Throughput trends, node distribution, system health
-
-### Node Types
-- **SparkNode**: Job tracking, throughput, executors
-- **KafkaNode**: Topic monitoring, partitions, message flow
-- **AirflowNode**: DAG execution, scheduling
-- **DatabaseNode**: Table monitoring, size tracking
-
-## 🛠️ Development
-
-### Prerequisites
-- Docker and Docker Compose
-- Node.js 18+ (for frontend development)
-- Go 1.24+ (for backend development)
-
-### Commands
-
+Option A — Docker (recommended)
 ```bash
-# Frontend development
-cd ui
-npm run dev              # Start dev server
-npm run build            # Build for production
-
-# Backend + Database
-docker-compose -f docker-compose.dev.yml up -d    # Start services
-docker-compose -f docker-compose.dev.yml down     # Stop services
-docker-compose -f docker-compose.dev.yml logs     # View logs
+cd backend
+docker compose up --build
+# API: http://localhost:8000
 ```
 
-## 📁 Project Structure
-
-```
-dlv/
-├── ui/                          # React frontend
-│   ├── src/
-│   │   ├── pages/Dashboard.tsx   # Main dashboard with React Flow
-│   │   ├── components/
-│   │   │   ├── nodes/           # Custom React Flow nodes
-│   │   │   ├── edges/           # Custom React Flow edges
-│   │   │   ├── MetricsPanel.tsx # Charts and metrics
-│   │   │   └── FilterPanel.tsx  # Filter controls
-│   │   └── ...
-│   └── Dockerfile               # Production build only
-├── docker-compose.dev.yml       # Development setup
-├── docker-compose.yml           # Production setup
-└── dev-start.sh                 # Development script
-```
-
-## 🔧 Configuration
-
-### Environment Variables
-- `VITE_API_URL`: Backend API URL (default: http://localhost:8080/api/v1)
-- `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`: Database config
-- `SECRET_KEY`: JWT secret key
-- `LOG_LEVEL`: Logging level (debug/info)
-
-### API Endpoints
-- `GET /health` - Health check
-- `GET /api/v1/lineage/graph` - Get lineage graph
-- `GET /api/v1/lineage/nodes` - Get all nodes
-- `GET /api/v1/lineage/edges` - Get all edges
-- `WS /ws/lineage` - WebSocket for real-time updates
-
-## 🚨 Troubleshooting
-
-### Frontend Issues
+Option B — Local (uv)
 ```bash
-cd ui
-rm -rf node_modules package-lock.json
-npm install
-npm run dev
+cd backend
+uv sync
+uv run uvicorn main:app --reload --port 8000
 ```
 
-### Backend Issues
+## Auth API (current scope)
+
+- POST /api/auth/login { username, password } -> { access_token, token_type }
+- GET  /api/auth/me (Bearer token) -> current user
+- POST /api/auth/users (admin only) -> create user { username, password, role }
+
+Example login:
 ```bash
-docker-compose -f docker-compose.dev.yml restart backend
-docker-compose -f docker-compose.dev.yml logs backend
+curl -X POST http://localhost:8000/api/auth/login \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  -d 'username=admin&password=admin123'
 ```
 
-### Database Issues
+Swagger UI:
+- http://localhost:8000/docs
+- Click Authorize (lock icon) to test endpoints requiring Bearer token.
+
+## Code Quality: pre-commit + ruff
+
+- Hooks are defined in .pre-commit-config.yaml
+- They run automatically on commit; run manually with:
 ```bash
-docker-compose -f docker-compose.dev.yml down -v
-docker-compose -f docker-compose.dev.yml up -d
+uv run pre-commit run --all-files
 ```
 
-## 📋 Supported Integrations
+## Next Phases (from PLAN.md)
 
-- **Apache Spark**: Structured Streaming, batch jobs, history server
-- **Apache Airflow**: DAG execution, task-level lineage
-- **Apache Kafka**: Topic-level lineage, producer/consumer tracking
-- **Apache Flink**: Streaming jobs, stateful transformations
-- **Custom**: OpenTelemetry, HTTP API, plugin support
+- Nodes & Dashboards CRUD, lineage storage (Neo4j)
+- Collectors (Spark, Airflow, DB) via Celery + Redis
+- Real-time status via WebSocket
+- React Flow editor and D3 lineage visualization
 
-## 🏗️ Architecture
+UI (temporarily empty):
+- Frontend will be created with React + TypeScript, React Flow for the drag-drop editor, and D3 for lineage graph.
+- UI code is not present in this phase to focus on backend + auth foundation.
 
-```
-Data Sources (Spark, Kafka, Airflow, Flink)
-           ↓
-    Collectors (Parse logs, metrics, APIs)
-           ↓
-   Lineage Processor (Build relationships, real-time updates)
-           ↓
-    Database (PostgreSQL)
-           ↓
-    Frontend (React + React Flow)
-```
+## License
 
-## 📄 License
-
-Apache License 2.0 - see [LICENSE](LICENSE) file for details.
-
----
-
-**Made with ❤️ for data engineers**
+TBD
