@@ -16,6 +16,7 @@ export function AppLayout({ children }: PropsWithChildren) {
         <div className="spacer" />
         <div className="header-actions">
           <span className="pill">MVP 1.0</span>
+          <NavLink className="sidebar-link" to="/login" style={{ padding: '6px 10px' }}>Sign in</NavLink>
           <div className="avatar" title="User" />
         </div>
       </header>
