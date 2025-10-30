@@ -94,6 +94,15 @@ Swagger UI:
 uv run pre-commit run --all-files
 ```
 
+## Start UI (dev)
+```bash
+cd ui
+npm install @vitejs/plugin-react
+npm install
+npm run dev
+# UI: http://localhost:5173
+```
+
 ## Next Phases (from PLAN.md)
 
 - Nodes & Dashboards CRUD, lineage storage (Neo4j)
