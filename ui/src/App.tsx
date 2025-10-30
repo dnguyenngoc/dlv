@@ -1,14 +1,14 @@
+import { AppLayout } from './components/layout/AppLayout'
+
 export function App() {
   return (
-    <div style={{ padding: 24, fontFamily: 'Inter, system-ui, Arial' }}>
-      <h1>DLV</h1>
-      <p>Data Lineage Visualizer UI (coming soon)</p>
-      <ul>
-        <li>Auth: admin/viewer (backend ready)</li>
-        <li>Nodes: Spark, Airflow, PostgreSQL</li>
-        <li>Lineage: edges, upstream/downstream</li>
-        <li>Dashboards: layout JSON</li>
-      </ul>
-    </div>
+    <AppLayout>
+      <h2 style={{ marginTop: 0 }}>Welcome</h2>
+      <p className="app-subtle">Smooth and modern UI foundation is ready.</p>
+      <div style={{ display: 'flex', gap: 12, marginTop: 16 }}>
+        <button className="btn-primary">Create Dashboard</button>
+        <button className="btn-primary" style={{ background: 'var(--color-accent)' }}>Add Node</button>
+      </div>
+    </AppLayout>
   )
 }
