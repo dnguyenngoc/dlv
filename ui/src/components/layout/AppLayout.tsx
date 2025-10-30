@@ -1,8 +1,15 @@
 import { PropsWithChildren } from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
+import { clearToken, isAuthenticated } from '../../lib/auth'
 import '../../styles/global.css'
 
 export function AppLayout({ children }: PropsWithChildren) {
+  const navigate = useNavigate()
+  const authed = isAuthenticated()
+  function logout() {
+    clearToken()
+    navigate('/login')
+  }
   return (
     <div className="app-shell">
       <header className="app-header">
@@ -16,7 +23,11 @@ export function AppLayout({ children }: PropsWithChildren) {
         <div className="spacer" />
         <div className="header-actions">
           <span className="pill">MVP 1.0</span>
-          <NavLink className="sidebar-link" to="/login" style={{ padding: '6px 10px' }}>Sign in</NavLink>
+          {!authed ? (
+            <NavLink className="sidebar-link" to="/login" style={{ padding: '6px 10px' }}>Sign in</NavLink>
+          ) : (
+            <button className="btn-primary" onClick={logout} style={{ padding: '6px 10px' }}>Logout</button>
+          )}
           <div className="avatar" title="User" />
         </div>
       </header>

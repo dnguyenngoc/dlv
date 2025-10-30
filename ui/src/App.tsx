@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { AppLayout } from './components/layout/AppLayout'
+import { Protected } from './components/Protected'
 import { Dashboards } from './pages/Dashboards'
 import { Nodes } from './pages/Nodes'
 import { Lineage } from './pages/Lineage'
@@ -23,25 +24,31 @@ export function App() {
       <Route
         path="/dashboards"
         element={
-          <AppLayout>
-            <Dashboards />
-          </AppLayout>
+          <Protected>
+            <AppLayout>
+              <Dashboards />
+            </AppLayout>
+          </Protected>
         }
       />
       <Route
         path="/nodes"
         element={
-          <AppLayout>
-            <Nodes />
-          </AppLayout>
+          <Protected>
+            <AppLayout>
+              <Nodes />
+            </AppLayout>
+          </Protected>
         }
       />
       <Route
         path="/lineage"
         element={
-          <AppLayout>
-            <Lineage />
-          </AppLayout>
+          <Protected>
+            <AppLayout>
+              <Lineage />
+            </AppLayout>
+          </Protected>
         }
       />
     </Routes>

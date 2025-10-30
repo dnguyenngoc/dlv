@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { setToken } from '../lib/auth'
 
 export function Login() {
   const [username, setUsername] = useState('')
@@ -19,12 +20,13 @@ export function Login() {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body,
       })
-      if (!res.ok) throw new Error('Invalid credentials')
+      if (res.status === 401) throw new Error('Invalid username or password')
+      if (!res.ok) throw new Error('Unexpected server error')
       const data = await res.json()
-      localStorage.setItem('dlv_token', data.access_token)
+      setToken(data.access_token)
       window.location.href = '/'
     } catch (err: any) {
-      setError(err.message || 'Login failed')
+      setError(err.message || 'Login failed. Please try again.')
     } finally {
       setLoading(false)
     }
