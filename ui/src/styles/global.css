@@ -24,6 +24,12 @@ body {
   background: var(--color-surface);
   box-shadow: var(--shadow-1);
 }
+.brand { display:flex; align-items:center; gap:12px; }
+.brand-mark { width:32px; height:32px; border-radius: 8px; display:grid; place-items:center; background: linear-gradient(135deg, var(--color-primary), var(--color-accent)); color:#0b0f1a; font-weight:700; box-shadow: var(--shadow-2); }
+.spacer { flex: 1 1 0; }
+.header-actions { display:flex; align-items:center; gap:12px; }
+.pill { font-size:12px; padding:4px 10px; border-radius:999px; background: rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.08); }
+.avatar { width:28px; height:28px; border-radius:999px; background: linear-gradient(180deg, #ccd7ff, #7aa2ff); box-shadow: var(--shadow-2); }
 .app-title { font-weight: 700; letter-spacing: .2px; }
 .app-subtle { color: var(--color-muted); }
 
@@ -39,12 +45,22 @@ body {
 }
 .sidebar-section { margin-bottom: var(--space-5); }
 .sidebar-title { font-size: 12px; text-transform: uppercase; color: var(--color-muted); margin: 0 0 var(--space-2) 0; }
-.sidebar-link { display:block; padding: 8px 10px; border-radius: var(--radius-sm); color: var(--color-text); text-decoration: none; }
-.sidebar-link:hover { background: rgba(255,255,255,.06); }
+.sidebar-link { display:flex; align-items:center; gap:10px; padding: 10px 12px; border-radius: var(--radius-md); color: var(--color-text); text-decoration: none; opacity:.9; transition: transform .12s ease, background .12s ease, opacity .12s ease; }
+.sidebar-link:hover { background: rgba(255,255,255,.06); opacity:1; transform: translateX(2px); }
+.sidebar-link .icon { width:20px; text-align:center; }
+.sidebar-link.active { background: linear-gradient(90deg, rgba(110,168,254,.22), rgba(34,211,238,.12)); border: 1px solid rgba(110,168,254,.35); box-shadow: inset 0 0 0 1px rgba(110,168,254,.25); opacity:1; }
 
 .app-content {
   padding: var(--space-6);
   min-width: 0;
+}
+
+@media (max-width: 900px) {
+  .app-body {
+    grid-template-columns: 1fr;
+  }
+  .app-sidebar { display: none; }
+  .app-content { padding: var(--space-4); }
 }
 
 .btn-primary {

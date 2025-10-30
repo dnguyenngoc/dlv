@@ -1,14 +1,18 @@
+import { Routes, Route, Navigate } from 'react-router-dom'
 import { AppLayout } from './components/layout/AppLayout'
+import { Dashboards } from './pages/Dashboards'
+import { Nodes } from './pages/Nodes'
+import { Lineage } from './pages/Lineage'
 
 export function App() {
   return (
     <AppLayout>
-      <h2 style={{ marginTop: 0 }}>Welcome</h2>
-      <p className="app-subtle">Smooth and modern UI foundation is ready.</p>
-      <div style={{ display: 'flex', gap: 12, marginTop: 16 }}>
-        <button className="btn-primary">Create Dashboard</button>
-        <button className="btn-primary" style={{ background: 'var(--color-accent)' }}>Add Node</button>
-      </div>
+      <Routes>
+        <Route path="/" element={<Navigate to="/dashboards" replace />} />
+        <Route path="/dashboards" element={<Dashboards />} />
+        <Route path="/nodes" element={<Nodes />} />
+        <Route path="/lineage" element={<Lineage />} />
+      </Routes>
     </AppLayout>
   )
 }
