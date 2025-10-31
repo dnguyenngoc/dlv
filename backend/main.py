@@ -1,6 +1,9 @@
 import os
 
 from app.api.routes.auth import router as auth_router
+from app.api.routes.dashboards import router as dashboards_router
+from app.api.routes.lineage import router as lineage_router
+from app.api.routes.nodes import router as nodes_router
 from app.core.database import Base, SessionLocal, engine
 from app.models.user import User, UserRole
 from app.security import get_password_hash
@@ -47,6 +50,9 @@ def create_app() -> FastAPI:
 
     # Routes
     app.include_router(auth_router)
+    app.include_router(nodes_router)
+    app.include_router(lineage_router)
+    app.include_router(dashboards_router)
 
     return app
 

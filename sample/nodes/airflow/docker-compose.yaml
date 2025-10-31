@@ -1,0 +1,30 @@
+services:
+
+  dlv-airflow:
+    image: apache/airflow:2.10.5
+    environment:
+      AIRFLOW_ENV: dev
+      AIRFLOW_HOME: /tmp/local_airflow
+      AIRFLOW__CORE__EXECUTOR: SequentialExecutor
+      AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+      AIRFLOW__CORE__DAGS_FOLDER: /opt/airflow/dags
+      AIRFLOW__CORE__PLUGINS_FOLDER: /opt/airflow/plugins
+      AIRFLOW__WEBSERVER__ACCESS_LOGFILE: /tmp/local_airflow/webserver.log
+      AIRFLOW__CORE__DEFAULT_TIMEZONE: Asia/Saigon
+      AIRFLOW__CORE__CHECK_SLAS: "True"
+      SQLALCHEMY_SILENCE_UBER_WARNING: "1"
+      # AWS_PROFILE: vnsdtdev
+      # AWS_CONFIG_FILE: /home/airflow/.aws/config
+      # AWS_SHARED_CREDENTIALS_FILE: /home/airflow/.aws/credentials
+      PYTHONPATH: /opt/airflow/dags
+      _AIRFLOW_WWW_USER_USERNAME: admin
+      _AIRFLOW_WWW_USER_PASSWORD: admin
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./plugins:/opt/airflow/plugins
+      - ./tmp/local_airflow:/tmp/local_airflow
+      # - ~/.aws:/home/airflow/.aws
+    ports:
+      - "8080:8080"
+    command: standalone
+    restart: always

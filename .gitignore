@@ -18,3 +18,9 @@ backend/backend.egg-info/
 
 # OS
 .DS_Store
+
+# pre-commit cache
+.ruff_cache/
+
+# tmp
+tmp/

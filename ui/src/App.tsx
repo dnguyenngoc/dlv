@@ -3,7 +3,6 @@ import { AppLayout } from './components/layout/AppLayout'
 import { Protected } from './components/Protected'
 import { Dashboards } from './pages/Dashboards'
 import { Nodes } from './pages/Nodes'
-import { Lineage } from './pages/Lineage'
 import { Login } from './pages/Login'
 
 export function App() {
@@ -37,16 +36,6 @@ export function App() {
           <Protected>
             <AppLayout>
               <Nodes />
-            </AppLayout>
-          </Protected>
-        }
-      />
-      <Route
-        path="/lineage"
-        element={
-          <Protected>
-            <AppLayout>
-              <Lineage />
             </AppLayout>
           </Protected>
         }
